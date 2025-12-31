@@ -4,7 +4,7 @@
 # compile CXX with /usr/bin/c++
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/Users/tanle/Desktop/IrisTrading/include
+CXX_INCLUDES = -I/Users/tanle/Desktop/IrisTrading/include -isystem /opt/homebrew/include
 
 CXX_FLAGSarm64 = -std=gnu++2b -arch arm64
 

@@ -1,0 +1,15 @@
+[SUCCESS] 1970-01-21 10:52:55: Data downloaded for BTCUSDT at interval 5
+[SUCCESS] 1970-01-21 10:52:55: Data downloaded for BTCUSDT at interval 15
+[SUCCESS] 1970-01-21 10:52:56: Data downloaded for BTCUSDT at interval 60
+[SUCCESS] 1970-01-21 10:52:56: Data downloaded for BTCUSDT at interval 240
+[SUCCESS] 1970-01-21 10:52:56: Data downloaded for BTCUSDT at interval D
+[SUCCESS] 1970-01-21 10:52:56: Data downloaded for ETHUSDT at interval 5
+[SUCCESS] 1970-01-21 10:52:56: Data downloaded for ETHUSDT at interval 15
+[SUCCESS] 1970-01-21 10:52:56: Data downloaded for ETHUSDT at interval 60
+[SUCCESS] 1970-01-21 10:52:56: Data downloaded for ETHUSDT at interval 240
+[SUCCESS] 1970-01-21 10:52:56: Data downloaded for ETHUSDT at interval D
+[SUCCESS] 1970-01-21 10:52:56: Data downloaded for SOLUSDT at interval 5
+[SUCCESS] 1970-01-21 10:52:57: Data downloaded for SOLUSDT at interval 15
+[SUCCESS] 1970-01-21 10:52:57: Data downloaded for SOLUSDT at interval 60
+[SUCCESS] 1970-01-21 10:52:57: Data downloaded for SOLUSDT at interval 240
+[SUCCESS] 1970-01-21 10:52:57: Data downloaded for SOLUSDT at interval D
