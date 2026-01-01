@@ -11,6 +11,8 @@ class Utils {
         void saveDataToFile(const std::string& data, const std::string& filename);
 
         void downloadData(std::string symbol, std::string interval, long long startTime);
+
+        void loadDataFromFile(const std::string& filename);
 };
 
 #endif  

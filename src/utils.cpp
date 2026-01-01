@@ -13,7 +13,7 @@
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
 
-long long STARTTIME = 1514739600000; // Example start time: January 1, 2021
+long long STARTTIME = 1514764800000; // January 1, 2018 in milliseconds
 
 size_t WriteCallback(void *contents, size_t size, size_t nmemb, void *userp)
 {
@@ -132,8 +132,10 @@ void Utils::downloadData(std::string symbol, std::string interval, long long sta
         }
         auto dataList = j["result"]["list"];
 
-        for (const auto &item : dataList)
+        for (int i = dataList.size() - 1; i >= 0; --i)
         {
+            auto& item = dataList[i];
+
             long long openTime = std::stoll(item[0].get<std::string>());
             double open = std::stod(item[1].get<std::string>());
             double high = std::stod(item[2].get<std::string>());
