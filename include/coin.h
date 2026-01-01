@@ -7,7 +7,7 @@ class Coin {
     private:
         std::string _symbol;
         std::string _interval;
-
+        
     public:
         Coin(const std::string& symbol, const std::string& interval);
 
