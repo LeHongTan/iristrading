@@ -9,6 +9,9 @@ set(CMAKE_DEPENDS_LANGUAGES
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/Users/tanle/Desktop/IrisTrading/main.cpp" "CMakeFiles/iris.dir/main.cpp.o" "gcc" "CMakeFiles/iris.dir/main.cpp.o.d"
+  "/Users/tanle/Desktop/IrisTrading/simulator/src/backtest_engine.cpp" "CMakeFiles/iris.dir/simulator/src/backtest_engine.cpp.o" "gcc" "CMakeFiles/iris.dir/simulator/src/backtest_engine.cpp.o.d"
+  "/Users/tanle/Desktop/IrisTrading/simulator/src/bybit_simulator.cpp" "CMakeFiles/iris.dir/simulator/src/bybit_simulator.cpp.o" "gcc" "CMakeFiles/iris.dir/simulator/src/bybit_simulator.cpp.o.d"
+  "/Users/tanle/Desktop/IrisTrading/simulator/src/trading_engine.cpp" "CMakeFiles/iris.dir/simulator/src/trading_engine.cpp.o" "gcc" "CMakeFiles/iris.dir/simulator/src/trading_engine.cpp.o.d"
   "/Users/tanle/Desktop/IrisTrading/src/candle.cpp" "CMakeFiles/iris.dir/src/candle.cpp.o" "gcc" "CMakeFiles/iris.dir/src/candle.cpp.o.d"
   "/Users/tanle/Desktop/IrisTrading/src/coin.cpp" "CMakeFiles/iris.dir/src/coin.cpp.o" "gcc" "CMakeFiles/iris.dir/src/coin.cpp.o.d"
   "/Users/tanle/Desktop/IrisTrading/src/indicators.cpp" "CMakeFiles/iris.dir/src/indicators.cpp.o" "gcc" "CMakeFiles/iris.dir/src/indicators.cpp.o.d"

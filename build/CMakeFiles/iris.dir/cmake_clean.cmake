@@ -1,6 +1,12 @@
 file(REMOVE_RECURSE
   "CMakeFiles/iris.dir/main.cpp.o"
   "CMakeFiles/iris.dir/main.cpp.o.d"
+  "CMakeFiles/iris.dir/simulator/src/backtest_engine.cpp.o"
+  "CMakeFiles/iris.dir/simulator/src/backtest_engine.cpp.o.d"
+  "CMakeFiles/iris.dir/simulator/src/bybit_simulator.cpp.o"
+  "CMakeFiles/iris.dir/simulator/src/bybit_simulator.cpp.o.d"
+  "CMakeFiles/iris.dir/simulator/src/trading_engine.cpp.o"
+  "CMakeFiles/iris.dir/simulator/src/trading_engine.cpp.o.d"
   "CMakeFiles/iris.dir/src/candle.cpp.o"
   "CMakeFiles/iris.dir/src/candle.cpp.o.d"
   "CMakeFiles/iris.dir/src/coin.cpp.o"

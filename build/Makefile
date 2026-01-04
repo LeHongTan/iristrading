@@ -153,6 +153,78 @@ main.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/iris.dir/build.make CMakeFiles/iris.dir/main.cpp.s
 .PHONY : main.cpp.s
 
+simulator/src/backtest_engine.o: simulator/src/backtest_engine.cpp.o
+.PHONY : simulator/src/backtest_engine.o
+
+# target to build an object file
+simulator/src/backtest_engine.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/iris.dir/build.make CMakeFiles/iris.dir/simulator/src/backtest_engine.cpp.o
+.PHONY : simulator/src/backtest_engine.cpp.o
+
+simulator/src/backtest_engine.i: simulator/src/backtest_engine.cpp.i
+.PHONY : simulator/src/backtest_engine.i
+
+# target to preprocess a source file
+simulator/src/backtest_engine.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/iris.dir/build.make CMakeFiles/iris.dir/simulator/src/backtest_engine.cpp.i
+.PHONY : simulator/src/backtest_engine.cpp.i
+
+simulator/src/backtest_engine.s: simulator/src/backtest_engine.cpp.s
+.PHONY : simulator/src/backtest_engine.s
+
+# target to generate assembly for a file
+simulator/src/backtest_engine.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/iris.dir/build.make CMakeFiles/iris.dir/simulator/src/backtest_engine.cpp.s
+.PHONY : simulator/src/backtest_engine.cpp.s
+
+simulator/src/bybit_simulator.o: simulator/src/bybit_simulator.cpp.o
+.PHONY : simulator/src/bybit_simulator.o
+
+# target to build an object file
+simulator/src/bybit_simulator.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/iris.dir/build.make CMakeFiles/iris.dir/simulator/src/bybit_simulator.cpp.o
+.PHONY : simulator/src/bybit_simulator.cpp.o
+
+simulator/src/bybit_simulator.i: simulator/src/bybit_simulator.cpp.i
+.PHONY : simulator/src/bybit_simulator.i
+
+# target to preprocess a source file
+simulator/src/bybit_simulator.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/iris.dir/build.make CMakeFiles/iris.dir/simulator/src/bybit_simulator.cpp.i
+.PHONY : simulator/src/bybit_simulator.cpp.i
+
+simulator/src/bybit_simulator.s: simulator/src/bybit_simulator.cpp.s
+.PHONY : simulator/src/bybit_simulator.s
+
+# target to generate assembly for a file
+simulator/src/bybit_simulator.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/iris.dir/build.make CMakeFiles/iris.dir/simulator/src/bybit_simulator.cpp.s
+.PHONY : simulator/src/bybit_simulator.cpp.s
+
+simulator/src/trading_engine.o: simulator/src/trading_engine.cpp.o
+.PHONY : simulator/src/trading_engine.o
+
+# target to build an object file
+simulator/src/trading_engine.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/iris.dir/build.make CMakeFiles/iris.dir/simulator/src/trading_engine.cpp.o
+.PHONY : simulator/src/trading_engine.cpp.o
+
+simulator/src/trading_engine.i: simulator/src/trading_engine.cpp.i
+.PHONY : simulator/src/trading_engine.i
+
+# target to preprocess a source file
+simulator/src/trading_engine.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/iris.dir/build.make CMakeFiles/iris.dir/simulator/src/trading_engine.cpp.i
+.PHONY : simulator/src/trading_engine.cpp.i
+
+simulator/src/trading_engine.s: simulator/src/trading_engine.cpp.s
+.PHONY : simulator/src/trading_engine.s
+
+# target to generate assembly for a file
+simulator/src/trading_engine.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/iris.dir/build.make CMakeFiles/iris.dir/simulator/src/trading_engine.cpp.s
+.PHONY : simulator/src/trading_engine.cpp.s
+
 src/candle.o: src/candle.cpp.o
 .PHONY : src/candle.o
 
@@ -285,6 +357,15 @@ help:
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"
+	@echo "... simulator/src/backtest_engine.o"
+	@echo "... simulator/src/backtest_engine.i"
+	@echo "... simulator/src/backtest_engine.s"
+	@echo "... simulator/src/bybit_simulator.o"
+	@echo "... simulator/src/bybit_simulator.i"
+	@echo "... simulator/src/bybit_simulator.s"
+	@echo "... simulator/src/trading_engine.o"
+	@echo "... simulator/src/trading_engine.i"
+	@echo "... simulator/src/trading_engine.s"
 	@echo "... src/candle.o"
 	@echo "... src/candle.i"
 	@echo "... src/candle.s"

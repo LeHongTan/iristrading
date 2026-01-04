@@ -156,6 +156,48 @@ CMakeFiles/iris.dir/src/smt_analysis.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/iris.dir/src/smt_analysis.cpp.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/tanle/Desktop/IrisTrading/src/smt_analysis.cpp -o CMakeFiles/iris.dir/src/smt_analysis.cpp.s
 
+CMakeFiles/iris.dir/simulator/src/bybit_simulator.cpp.o: CMakeFiles/iris.dir/flags.make
+CMakeFiles/iris.dir/simulator/src/bybit_simulator.cpp.o: /Users/tanle/Desktop/IrisTrading/simulator/src/bybit_simulator.cpp
+CMakeFiles/iris.dir/simulator/src/bybit_simulator.cpp.o: CMakeFiles/iris.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/tanle/Desktop/IrisTrading/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/iris.dir/simulator/src/bybit_simulator.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/iris.dir/simulator/src/bybit_simulator.cpp.o -MF CMakeFiles/iris.dir/simulator/src/bybit_simulator.cpp.o.d -o CMakeFiles/iris.dir/simulator/src/bybit_simulator.cpp.o -c /Users/tanle/Desktop/IrisTrading/simulator/src/bybit_simulator.cpp
+
+CMakeFiles/iris.dir/simulator/src/bybit_simulator.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/iris.dir/simulator/src/bybit_simulator.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/tanle/Desktop/IrisTrading/simulator/src/bybit_simulator.cpp > CMakeFiles/iris.dir/simulator/src/bybit_simulator.cpp.i
+
+CMakeFiles/iris.dir/simulator/src/bybit_simulator.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/iris.dir/simulator/src/bybit_simulator.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/tanle/Desktop/IrisTrading/simulator/src/bybit_simulator.cpp -o CMakeFiles/iris.dir/simulator/src/bybit_simulator.cpp.s
+
+CMakeFiles/iris.dir/simulator/src/trading_engine.cpp.o: CMakeFiles/iris.dir/flags.make
+CMakeFiles/iris.dir/simulator/src/trading_engine.cpp.o: /Users/tanle/Desktop/IrisTrading/simulator/src/trading_engine.cpp
+CMakeFiles/iris.dir/simulator/src/trading_engine.cpp.o: CMakeFiles/iris.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/tanle/Desktop/IrisTrading/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object CMakeFiles/iris.dir/simulator/src/trading_engine.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/iris.dir/simulator/src/trading_engine.cpp.o -MF CMakeFiles/iris.dir/simulator/src/trading_engine.cpp.o.d -o CMakeFiles/iris.dir/simulator/src/trading_engine.cpp.o -c /Users/tanle/Desktop/IrisTrading/simulator/src/trading_engine.cpp
+
+CMakeFiles/iris.dir/simulator/src/trading_engine.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/iris.dir/simulator/src/trading_engine.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/tanle/Desktop/IrisTrading/simulator/src/trading_engine.cpp > CMakeFiles/iris.dir/simulator/src/trading_engine.cpp.i
+
+CMakeFiles/iris.dir/simulator/src/trading_engine.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/iris.dir/simulator/src/trading_engine.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/tanle/Desktop/IrisTrading/simulator/src/trading_engine.cpp -o CMakeFiles/iris.dir/simulator/src/trading_engine.cpp.s
+
+CMakeFiles/iris.dir/simulator/src/backtest_engine.cpp.o: CMakeFiles/iris.dir/flags.make
+CMakeFiles/iris.dir/simulator/src/backtest_engine.cpp.o: /Users/tanle/Desktop/IrisTrading/simulator/src/backtest_engine.cpp
+CMakeFiles/iris.dir/simulator/src/backtest_engine.cpp.o: CMakeFiles/iris.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/tanle/Desktop/IrisTrading/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object CMakeFiles/iris.dir/simulator/src/backtest_engine.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/iris.dir/simulator/src/backtest_engine.cpp.o -MF CMakeFiles/iris.dir/simulator/src/backtest_engine.cpp.o.d -o CMakeFiles/iris.dir/simulator/src/backtest_engine.cpp.o -c /Users/tanle/Desktop/IrisTrading/simulator/src/backtest_engine.cpp
+
+CMakeFiles/iris.dir/simulator/src/backtest_engine.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/iris.dir/simulator/src/backtest_engine.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/tanle/Desktop/IrisTrading/simulator/src/backtest_engine.cpp > CMakeFiles/iris.dir/simulator/src/backtest_engine.cpp.i
+
+CMakeFiles/iris.dir/simulator/src/backtest_engine.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/iris.dir/simulator/src/backtest_engine.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/tanle/Desktop/IrisTrading/simulator/src/backtest_engine.cpp -o CMakeFiles/iris.dir/simulator/src/backtest_engine.cpp.s
+
 # Object files for target iris
 iris_OBJECTS = \
 "CMakeFiles/iris.dir/main.cpp.o" \
@@ -163,7 +205,10 @@ iris_OBJECTS = \
 "CMakeFiles/iris.dir/src/coin.cpp.o" \
 "CMakeFiles/iris.dir/src/candle.cpp.o" \
 "CMakeFiles/iris.dir/src/indicators.cpp.o" \
-"CMakeFiles/iris.dir/src/smt_analysis.cpp.o"
+"CMakeFiles/iris.dir/src/smt_analysis.cpp.o" \
+"CMakeFiles/iris.dir/simulator/src/bybit_simulator.cpp.o" \
+"CMakeFiles/iris.dir/simulator/src/trading_engine.cpp.o" \
+"CMakeFiles/iris.dir/simulator/src/backtest_engine.cpp.o"
 
 # External object files for target iris
 iris_EXTERNAL_OBJECTS =
@@ -174,11 +219,14 @@ iris: CMakeFiles/iris.dir/src/coin.cpp.o
 iris: CMakeFiles/iris.dir/src/candle.cpp.o
 iris: CMakeFiles/iris.dir/src/indicators.cpp.o
 iris: CMakeFiles/iris.dir/src/smt_analysis.cpp.o
+iris: CMakeFiles/iris.dir/simulator/src/bybit_simulator.cpp.o
+iris: CMakeFiles/iris.dir/simulator/src/trading_engine.cpp.o
+iris: CMakeFiles/iris.dir/simulator/src/backtest_engine.cpp.o
 iris: CMakeFiles/iris.dir/build.make
 iris: /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib/libcurl.tbd
 iris: /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib/libcurl.tbd
 iris: CMakeFiles/iris.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/Users/tanle/Desktop/IrisTrading/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Linking CXX executable iris"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/Users/tanle/Desktop/IrisTrading/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Linking CXX executable iris"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/iris.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

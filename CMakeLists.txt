@@ -10,6 +10,9 @@ set(SOURCES
     src/candle.cpp
     src/indicators.cpp
     src/smt_analysis.cpp
+    simulator/src/bybit_simulator.cpp
+    simulator/src/trading_engine.cpp
+    simulator/src/backtest_engine.cpp
 )
 
 find_package(CURL REQUIRED)
@@ -17,5 +20,8 @@ find_package(nlohmann_json REQUIRED)
 
 add_executable(iris ${SOURCES})
 
-target_include_directories(iris PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_include_directories(iris PRIVATE 
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/simulator/include
+)
 target_link_libraries(iris PRIVATE CURL::libcurl nlohmann_json::nlohmann_json)
