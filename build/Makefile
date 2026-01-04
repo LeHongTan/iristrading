@@ -153,6 +153,30 @@ main.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/iris.dir/build.make CMakeFiles/iris.dir/main.cpp.s
 .PHONY : main.cpp.s
 
+src/candle.o: src/candle.cpp.o
+.PHONY : src/candle.o
+
+# target to build an object file
+src/candle.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/iris.dir/build.make CMakeFiles/iris.dir/src/candle.cpp.o
+.PHONY : src/candle.cpp.o
+
+src/candle.i: src/candle.cpp.i
+.PHONY : src/candle.i
+
+# target to preprocess a source file
+src/candle.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/iris.dir/build.make CMakeFiles/iris.dir/src/candle.cpp.i
+.PHONY : src/candle.cpp.i
+
+src/candle.s: src/candle.cpp.s
+.PHONY : src/candle.s
+
+# target to generate assembly for a file
+src/candle.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/iris.dir/build.make CMakeFiles/iris.dir/src/candle.cpp.s
+.PHONY : src/candle.cpp.s
+
 src/coin.o: src/coin.cpp.o
 .PHONY : src/coin.o
 
@@ -176,6 +200,54 @@ src/coin.s: src/coin.cpp.s
 src/coin.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/iris.dir/build.make CMakeFiles/iris.dir/src/coin.cpp.s
 .PHONY : src/coin.cpp.s
+
+src/indicators.o: src/indicators.cpp.o
+.PHONY : src/indicators.o
+
+# target to build an object file
+src/indicators.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/iris.dir/build.make CMakeFiles/iris.dir/src/indicators.cpp.o
+.PHONY : src/indicators.cpp.o
+
+src/indicators.i: src/indicators.cpp.i
+.PHONY : src/indicators.i
+
+# target to preprocess a source file
+src/indicators.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/iris.dir/build.make CMakeFiles/iris.dir/src/indicators.cpp.i
+.PHONY : src/indicators.cpp.i
+
+src/indicators.s: src/indicators.cpp.s
+.PHONY : src/indicators.s
+
+# target to generate assembly for a file
+src/indicators.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/iris.dir/build.make CMakeFiles/iris.dir/src/indicators.cpp.s
+.PHONY : src/indicators.cpp.s
+
+src/smt_analysis.o: src/smt_analysis.cpp.o
+.PHONY : src/smt_analysis.o
+
+# target to build an object file
+src/smt_analysis.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/iris.dir/build.make CMakeFiles/iris.dir/src/smt_analysis.cpp.o
+.PHONY : src/smt_analysis.cpp.o
+
+src/smt_analysis.i: src/smt_analysis.cpp.i
+.PHONY : src/smt_analysis.i
+
+# target to preprocess a source file
+src/smt_analysis.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/iris.dir/build.make CMakeFiles/iris.dir/src/smt_analysis.cpp.i
+.PHONY : src/smt_analysis.cpp.i
+
+src/smt_analysis.s: src/smt_analysis.cpp.s
+.PHONY : src/smt_analysis.s
+
+# target to generate assembly for a file
+src/smt_analysis.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/iris.dir/build.make CMakeFiles/iris.dir/src/smt_analysis.cpp.s
+.PHONY : src/smt_analysis.cpp.s
 
 src/utils.o: src/utils.cpp.o
 .PHONY : src/utils.o
@@ -213,9 +285,18 @@ help:
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"
+	@echo "... src/candle.o"
+	@echo "... src/candle.i"
+	@echo "... src/candle.s"
 	@echo "... src/coin.o"
 	@echo "... src/coin.i"
 	@echo "... src/coin.s"
+	@echo "... src/indicators.o"
+	@echo "... src/indicators.i"
+	@echo "... src/indicators.s"
+	@echo "... src/smt_analysis.o"
+	@echo "... src/smt_analysis.i"
+	@echo "... src/smt_analysis.s"
 	@echo "... src/utils.o"
 	@echo "... src/utils.i"
 	@echo "... src/utils.s"

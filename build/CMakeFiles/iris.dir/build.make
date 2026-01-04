@@ -114,11 +114,56 @@ CMakeFiles/iris.dir/src/coin.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/iris.dir/src/coin.cpp.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/tanle/Desktop/IrisTrading/src/coin.cpp -o CMakeFiles/iris.dir/src/coin.cpp.s
 
+CMakeFiles/iris.dir/src/candle.cpp.o: CMakeFiles/iris.dir/flags.make
+CMakeFiles/iris.dir/src/candle.cpp.o: /Users/tanle/Desktop/IrisTrading/src/candle.cpp
+CMakeFiles/iris.dir/src/candle.cpp.o: CMakeFiles/iris.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/tanle/Desktop/IrisTrading/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/iris.dir/src/candle.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/iris.dir/src/candle.cpp.o -MF CMakeFiles/iris.dir/src/candle.cpp.o.d -o CMakeFiles/iris.dir/src/candle.cpp.o -c /Users/tanle/Desktop/IrisTrading/src/candle.cpp
+
+CMakeFiles/iris.dir/src/candle.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/iris.dir/src/candle.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/tanle/Desktop/IrisTrading/src/candle.cpp > CMakeFiles/iris.dir/src/candle.cpp.i
+
+CMakeFiles/iris.dir/src/candle.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/iris.dir/src/candle.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/tanle/Desktop/IrisTrading/src/candle.cpp -o CMakeFiles/iris.dir/src/candle.cpp.s
+
+CMakeFiles/iris.dir/src/indicators.cpp.o: CMakeFiles/iris.dir/flags.make
+CMakeFiles/iris.dir/src/indicators.cpp.o: /Users/tanle/Desktop/IrisTrading/src/indicators.cpp
+CMakeFiles/iris.dir/src/indicators.cpp.o: CMakeFiles/iris.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/tanle/Desktop/IrisTrading/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/iris.dir/src/indicators.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/iris.dir/src/indicators.cpp.o -MF CMakeFiles/iris.dir/src/indicators.cpp.o.d -o CMakeFiles/iris.dir/src/indicators.cpp.o -c /Users/tanle/Desktop/IrisTrading/src/indicators.cpp
+
+CMakeFiles/iris.dir/src/indicators.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/iris.dir/src/indicators.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/tanle/Desktop/IrisTrading/src/indicators.cpp > CMakeFiles/iris.dir/src/indicators.cpp.i
+
+CMakeFiles/iris.dir/src/indicators.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/iris.dir/src/indicators.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/tanle/Desktop/IrisTrading/src/indicators.cpp -o CMakeFiles/iris.dir/src/indicators.cpp.s
+
+CMakeFiles/iris.dir/src/smt_analysis.cpp.o: CMakeFiles/iris.dir/flags.make
+CMakeFiles/iris.dir/src/smt_analysis.cpp.o: /Users/tanle/Desktop/IrisTrading/src/smt_analysis.cpp
+CMakeFiles/iris.dir/src/smt_analysis.cpp.o: CMakeFiles/iris.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/tanle/Desktop/IrisTrading/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/iris.dir/src/smt_analysis.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/iris.dir/src/smt_analysis.cpp.o -MF CMakeFiles/iris.dir/src/smt_analysis.cpp.o.d -o CMakeFiles/iris.dir/src/smt_analysis.cpp.o -c /Users/tanle/Desktop/IrisTrading/src/smt_analysis.cpp
+
+CMakeFiles/iris.dir/src/smt_analysis.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/iris.dir/src/smt_analysis.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/tanle/Desktop/IrisTrading/src/smt_analysis.cpp > CMakeFiles/iris.dir/src/smt_analysis.cpp.i
+
+CMakeFiles/iris.dir/src/smt_analysis.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/iris.dir/src/smt_analysis.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/tanle/Desktop/IrisTrading/src/smt_analysis.cpp -o CMakeFiles/iris.dir/src/smt_analysis.cpp.s
+
 # Object files for target iris
 iris_OBJECTS = \
 "CMakeFiles/iris.dir/main.cpp.o" \
 "CMakeFiles/iris.dir/src/utils.cpp.o" \
-"CMakeFiles/iris.dir/src/coin.cpp.o"
+"CMakeFiles/iris.dir/src/coin.cpp.o" \
+"CMakeFiles/iris.dir/src/candle.cpp.o" \
+"CMakeFiles/iris.dir/src/indicators.cpp.o" \
+"CMakeFiles/iris.dir/src/smt_analysis.cpp.o"
 
 # External object files for target iris
 iris_EXTERNAL_OBJECTS =
@@ -126,11 +171,14 @@ iris_EXTERNAL_OBJECTS =
 iris: CMakeFiles/iris.dir/main.cpp.o
 iris: CMakeFiles/iris.dir/src/utils.cpp.o
 iris: CMakeFiles/iris.dir/src/coin.cpp.o
+iris: CMakeFiles/iris.dir/src/candle.cpp.o
+iris: CMakeFiles/iris.dir/src/indicators.cpp.o
+iris: CMakeFiles/iris.dir/src/smt_analysis.cpp.o
 iris: CMakeFiles/iris.dir/build.make
 iris: /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib/libcurl.tbd
 iris: /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib/libcurl.tbd
 iris: CMakeFiles/iris.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/Users/tanle/Desktop/IrisTrading/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Linking CXX executable iris"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/Users/tanle/Desktop/IrisTrading/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Linking CXX executable iris"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/iris.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

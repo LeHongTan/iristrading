@@ -7,6 +7,9 @@ set(SOURCES
     main.cpp 
     src/utils.cpp
     src/coin.cpp
+    src/candle.cpp
+    src/indicators.cpp
+    src/smt_analysis.cpp
 )
 
 find_package(CURL REQUIRED)
