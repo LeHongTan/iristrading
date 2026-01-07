@@ -50,11 +50,50 @@ std::string TradingEngine::placeOrder(const std::string& symbol, OrderType type,
     order.stopLoss = stopLoss;
     order.takeProfit = takeProfit;
     order.status = PENDING;
-    order.timestamp = std::time(nullptr) * 1000;
+    
+    // Sử dụng current candle timestamp nếu có, hoặc current time
+    if (candleData.find(symbol) != candleData.end() && currentCandleIndex[symbol] < static_cast<int>(candleData[symbol].size())) {
+        const Candle& currentCandle = candleData[symbol][currentCandleIndex[symbol]];
+        order.timestamp = currentCandle.getTimeOpen();  // Dùng timestamp của current candle
+    } else {
+        order.timestamp = std::time(nullptr) * 1000;
+    }
+    
     order.filledQuantity = 0.0;
     order.avgFillPrice = 0.0;
     order.fee = 0.0;
     order.isBothSidesHit = false;
+    
+    // Validation: Chặn Limit order với timestamp cũ (look-ahead bias)
+    // Nếu là Limit order và có current candle data, kiểm tra timestamp
+    if (type == LIMIT && candleData.find(symbol) != candleData.end() && 
+        currentCandleIndex[symbol] < static_cast<int>(candleData[symbol].size())) {
+        const Candle& currentCandle = candleData[symbol][currentCandleIndex[symbol]];
+        long long currentCandleTime = currentCandle.getTimeOpen();
+        
+        // Nếu order timestamp < current candle time, có thể là look-ahead bias
+        // (User dùng candle.close để đặt Limit order với timestamp cũ)
+        if (order.timestamp < currentCandleTime) {
+            order.status = REJECTED;
+            return order.orderId;
+        }
+        
+        // Nếu Limit price nằm trong range của current candle (đã đóng), reject
+        // Vì không thể đặt Limit order trong nến đã đóng
+        if (order.timestamp == currentCandleTime) {
+            if ((side == BUY && order.price >= currentCandle.getLow() && order.price <= currentCandle.getHigh()) ||
+                (side == SELL && order.price >= currentCandle.getLow() && order.price <= currentCandle.getHigh())) {
+                // Limit price nằm trong range của nến đã đóng → có thể là look-ahead bias
+                // Chỉ reject nếu giá quá gần với close (ăn gian)
+                double closePrice = currentCandle.getClose();
+                double priceDiff = std::abs(order.price - closePrice) / closePrice;
+                if (priceDiff < 0.001) {  // Nếu cách close < 0.1%, có thể là ăn gian
+                    order.status = REJECTED;
+                    return order.orderId;
+                }
+            }
+        }
+    }
     
     // Kiểm tra margin
     if (candleData.find(symbol) != candleData.end() && currentCandleIndex[symbol] < static_cast<int>(candleData[symbol].size())) {
@@ -232,10 +271,23 @@ void TradingEngine::checkLiquidation(const std::string& symbol, const Candle& ca
     double availableForMargin = account.balance + totalUnrealizedPnl;
     
     if (availableForMargin < totalMaintenanceMargin) {
-        // Liquidation: Đóng tất cả positions
-        for (auto& pos : account.positions) {
-            if (pos.symbol == symbol && pos.isOpen) {
-                closePosition(symbol, pos.size, pos.markPrice, candle.getTimeClose());
+        // Liquidation: Đóng tất cả positions (Cross Margin)
+        // Lưu danh sách positions cần đóng trước để tránh iterator invalidation
+        std::vector<std::pair<std::string, double>> positionsToClose;
+        for (const auto& pos : account.positions) {
+            if (pos.isOpen) {
+                positionsToClose.push_back({pos.symbol, pos.size});
+            }
+        }
+        
+        // Đóng tất cả positions
+        for (const auto& [posSymbol, posSize] : positionsToClose) {
+            // Tìm position để lấy markPrice
+            for (auto& pos : account.positions) {
+                if (pos.symbol == posSymbol && pos.isOpen) {
+                    closePosition(posSymbol, posSize, pos.markPrice, candle.getTimeClose());
+                    break;
+                }
             }
         }
     }
@@ -274,16 +326,18 @@ void TradingEngine::executePendingOrders(const std::string& symbol, const Candle
             account.totalFees += trade.fee;
             account.tradeHistory.push_back(trade);
             
-            // Open or update position
-            Position* position = nullptr;
-            for (auto& pos : account.positions) {
-                if (pos.symbol == symbol && pos.isOpen && pos.side == (order.side == BUY ? LONG : SHORT)) {
-                    position = &pos;
+            // Open or update position - Dùng index thay vì pointer để tránh memory safety risk
+            int positionIndex = -1;
+            for (size_t i = 0; i < account.positions.size(); ++i) {
+                if (account.positions[i].symbol == symbol && 
+                    account.positions[i].isOpen && 
+                    account.positions[i].side == (order.side == BUY ? LONG : SHORT)) {
+                    positionIndex = i;
                     break;
                 }
             }
             
-            if (!position) {
+            if (positionIndex == -1) {
                 // Open new position
                 Position newPos;
                 newPos.symbol = symbol;
@@ -308,16 +362,16 @@ void TradingEngine::executePendingOrders(const std::string& symbol, const Candle
                 account.marginUsed += newPos.margin;
                 account.availableBalance -= newPos.margin;
             } else {
-                // Update existing position
-                double totalValue = position->size * position->entryPrice + trade.quantity * trade.price;
-                double totalSize = position->size + trade.quantity;
-                position->entryPrice = totalValue / totalSize;
-                position->size = totalSize;
-                position->margin = (totalSize * position->entryPrice) / position->leverage;
-                position->totalFees += trade.fee;
+                // Update existing position - Dùng index để tránh pointer invalidation
+                double totalValue = account.positions[positionIndex].size * account.positions[positionIndex].entryPrice + trade.quantity * trade.price;
+                double totalSize = account.positions[positionIndex].size + trade.quantity;
+                account.positions[positionIndex].entryPrice = totalValue / totalSize;
+                account.positions[positionIndex].size = totalSize;
+                account.positions[positionIndex].margin = (totalSize * account.positions[positionIndex].entryPrice) / account.positions[positionIndex].leverage;
+                account.positions[positionIndex].totalFees += trade.fee;
                 // Update SL/TP nếu order mới có
-                if (order.stopLoss > 0) position->stopLoss = order.stopLoss;
-                if (order.takeProfit > 0) position->takeProfit = order.takeProfit;
+                if (order.stopLoss > 0) account.positions[positionIndex].stopLoss = order.stopLoss;
+                if (order.takeProfit > 0) account.positions[positionIndex].takeProfit = order.takeProfit;
             }
         }
     }
@@ -333,6 +387,13 @@ void TradingEngine::executePendingOrders(const std::string& symbol, const Candle
 void TradingEngine::checkStopLossTakeProfit(const std::string& symbol, const Candle& candle, long long timestamp) {
     for (auto& pos : account.positions) {
         if (pos.symbol != symbol || !pos.isOpen) continue;
+        
+        // QUAN TRỌNG: Không check SL/TP trong cùng nến khi position vừa được tạo
+        // Nếu position được mở trong nến này (openTime == timestamp), bỏ qua check
+        // Vì nếu Buy Limit khớp tại Low, không thể có SL thấp hơn trong cùng nến
+        if (pos.openTime == timestamp) {
+            continue;  // Skip check trong nến đầu tiên
+        }
         
         // Kiểm tra cả 2 đầu có bị quét không
         bool stopLossHit = false;

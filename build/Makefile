@@ -129,6 +129,43 @@ iris/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/iris.dir/build.make CMakeFiles/iris.dir/build
 .PHONY : iris/fast
 
+#=============================================================================
+# Target rules for targets named backtest_example
+
+# Build rule for target.
+backtest_example: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 backtest_example
+.PHONY : backtest_example
+
+# fast build rule for target.
+backtest_example/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backtest_example.dir/build.make CMakeFiles/backtest_example.dir/build
+.PHONY : backtest_example/fast
+
+examples/backtest_example.o: examples/backtest_example.cpp.o
+.PHONY : examples/backtest_example.o
+
+# target to build an object file
+examples/backtest_example.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backtest_example.dir/build.make CMakeFiles/backtest_example.dir/examples/backtest_example.cpp.o
+.PHONY : examples/backtest_example.cpp.o
+
+examples/backtest_example.i: examples/backtest_example.cpp.i
+.PHONY : examples/backtest_example.i
+
+# target to preprocess a source file
+examples/backtest_example.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backtest_example.dir/build.make CMakeFiles/backtest_example.dir/examples/backtest_example.cpp.i
+.PHONY : examples/backtest_example.cpp.i
+
+examples/backtest_example.s: examples/backtest_example.cpp.s
+.PHONY : examples/backtest_example.s
+
+# target to generate assembly for a file
+examples/backtest_example.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backtest_example.dir/build.make CMakeFiles/backtest_example.dir/examples/backtest_example.cpp.s
+.PHONY : examples/backtest_example.cpp.s
+
 main.o: main.cpp.o
 .PHONY : main.o
 
@@ -159,6 +196,7 @@ simulator/src/backtest_engine.o: simulator/src/backtest_engine.cpp.o
 # target to build an object file
 simulator/src/backtest_engine.cpp.o:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/iris.dir/build.make CMakeFiles/iris.dir/simulator/src/backtest_engine.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backtest_example.dir/build.make CMakeFiles/backtest_example.dir/simulator/src/backtest_engine.cpp.o
 .PHONY : simulator/src/backtest_engine.cpp.o
 
 simulator/src/backtest_engine.i: simulator/src/backtest_engine.cpp.i
@@ -167,6 +205,7 @@ simulator/src/backtest_engine.i: simulator/src/backtest_engine.cpp.i
 # target to preprocess a source file
 simulator/src/backtest_engine.cpp.i:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/iris.dir/build.make CMakeFiles/iris.dir/simulator/src/backtest_engine.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backtest_example.dir/build.make CMakeFiles/backtest_example.dir/simulator/src/backtest_engine.cpp.i
 .PHONY : simulator/src/backtest_engine.cpp.i
 
 simulator/src/backtest_engine.s: simulator/src/backtest_engine.cpp.s
@@ -175,6 +214,7 @@ simulator/src/backtest_engine.s: simulator/src/backtest_engine.cpp.s
 # target to generate assembly for a file
 simulator/src/backtest_engine.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/iris.dir/build.make CMakeFiles/iris.dir/simulator/src/backtest_engine.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backtest_example.dir/build.make CMakeFiles/backtest_example.dir/simulator/src/backtest_engine.cpp.s
 .PHONY : simulator/src/backtest_engine.cpp.s
 
 simulator/src/bybit_simulator.o: simulator/src/bybit_simulator.cpp.o
@@ -183,6 +223,7 @@ simulator/src/bybit_simulator.o: simulator/src/bybit_simulator.cpp.o
 # target to build an object file
 simulator/src/bybit_simulator.cpp.o:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/iris.dir/build.make CMakeFiles/iris.dir/simulator/src/bybit_simulator.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backtest_example.dir/build.make CMakeFiles/backtest_example.dir/simulator/src/bybit_simulator.cpp.o
 .PHONY : simulator/src/bybit_simulator.cpp.o
 
 simulator/src/bybit_simulator.i: simulator/src/bybit_simulator.cpp.i
@@ -191,6 +232,7 @@ simulator/src/bybit_simulator.i: simulator/src/bybit_simulator.cpp.i
 # target to preprocess a source file
 simulator/src/bybit_simulator.cpp.i:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/iris.dir/build.make CMakeFiles/iris.dir/simulator/src/bybit_simulator.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backtest_example.dir/build.make CMakeFiles/backtest_example.dir/simulator/src/bybit_simulator.cpp.i
 .PHONY : simulator/src/bybit_simulator.cpp.i
 
 simulator/src/bybit_simulator.s: simulator/src/bybit_simulator.cpp.s
@@ -199,6 +241,7 @@ simulator/src/bybit_simulator.s: simulator/src/bybit_simulator.cpp.s
 # target to generate assembly for a file
 simulator/src/bybit_simulator.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/iris.dir/build.make CMakeFiles/iris.dir/simulator/src/bybit_simulator.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backtest_example.dir/build.make CMakeFiles/backtest_example.dir/simulator/src/bybit_simulator.cpp.s
 .PHONY : simulator/src/bybit_simulator.cpp.s
 
 simulator/src/trading_engine.o: simulator/src/trading_engine.cpp.o
@@ -207,6 +250,7 @@ simulator/src/trading_engine.o: simulator/src/trading_engine.cpp.o
 # target to build an object file
 simulator/src/trading_engine.cpp.o:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/iris.dir/build.make CMakeFiles/iris.dir/simulator/src/trading_engine.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backtest_example.dir/build.make CMakeFiles/backtest_example.dir/simulator/src/trading_engine.cpp.o
 .PHONY : simulator/src/trading_engine.cpp.o
 
 simulator/src/trading_engine.i: simulator/src/trading_engine.cpp.i
@@ -215,6 +259,7 @@ simulator/src/trading_engine.i: simulator/src/trading_engine.cpp.i
 # target to preprocess a source file
 simulator/src/trading_engine.cpp.i:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/iris.dir/build.make CMakeFiles/iris.dir/simulator/src/trading_engine.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backtest_example.dir/build.make CMakeFiles/backtest_example.dir/simulator/src/trading_engine.cpp.i
 .PHONY : simulator/src/trading_engine.cpp.i
 
 simulator/src/trading_engine.s: simulator/src/trading_engine.cpp.s
@@ -223,6 +268,7 @@ simulator/src/trading_engine.s: simulator/src/trading_engine.cpp.s
 # target to generate assembly for a file
 simulator/src/trading_engine.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/iris.dir/build.make CMakeFiles/iris.dir/simulator/src/trading_engine.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backtest_example.dir/build.make CMakeFiles/backtest_example.dir/simulator/src/trading_engine.cpp.s
 .PHONY : simulator/src/trading_engine.cpp.s
 
 src/candle.o: src/candle.cpp.o
@@ -231,6 +277,7 @@ src/candle.o: src/candle.cpp.o
 # target to build an object file
 src/candle.cpp.o:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/iris.dir/build.make CMakeFiles/iris.dir/src/candle.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backtest_example.dir/build.make CMakeFiles/backtest_example.dir/src/candle.cpp.o
 .PHONY : src/candle.cpp.o
 
 src/candle.i: src/candle.cpp.i
@@ -239,6 +286,7 @@ src/candle.i: src/candle.cpp.i
 # target to preprocess a source file
 src/candle.cpp.i:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/iris.dir/build.make CMakeFiles/iris.dir/src/candle.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backtest_example.dir/build.make CMakeFiles/backtest_example.dir/src/candle.cpp.i
 .PHONY : src/candle.cpp.i
 
 src/candle.s: src/candle.cpp.s
@@ -247,6 +295,7 @@ src/candle.s: src/candle.cpp.s
 # target to generate assembly for a file
 src/candle.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/iris.dir/build.make CMakeFiles/iris.dir/src/candle.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backtest_example.dir/build.make CMakeFiles/backtest_example.dir/src/candle.cpp.s
 .PHONY : src/candle.cpp.s
 
 src/coin.o: src/coin.cpp.o
@@ -255,6 +304,7 @@ src/coin.o: src/coin.cpp.o
 # target to build an object file
 src/coin.cpp.o:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/iris.dir/build.make CMakeFiles/iris.dir/src/coin.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backtest_example.dir/build.make CMakeFiles/backtest_example.dir/src/coin.cpp.o
 .PHONY : src/coin.cpp.o
 
 src/coin.i: src/coin.cpp.i
@@ -263,6 +313,7 @@ src/coin.i: src/coin.cpp.i
 # target to preprocess a source file
 src/coin.cpp.i:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/iris.dir/build.make CMakeFiles/iris.dir/src/coin.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backtest_example.dir/build.make CMakeFiles/backtest_example.dir/src/coin.cpp.i
 .PHONY : src/coin.cpp.i
 
 src/coin.s: src/coin.cpp.s
@@ -271,6 +322,7 @@ src/coin.s: src/coin.cpp.s
 # target to generate assembly for a file
 src/coin.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/iris.dir/build.make CMakeFiles/iris.dir/src/coin.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backtest_example.dir/build.make CMakeFiles/backtest_example.dir/src/coin.cpp.s
 .PHONY : src/coin.cpp.s
 
 src/indicators.o: src/indicators.cpp.o
@@ -279,6 +331,7 @@ src/indicators.o: src/indicators.cpp.o
 # target to build an object file
 src/indicators.cpp.o:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/iris.dir/build.make CMakeFiles/iris.dir/src/indicators.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backtest_example.dir/build.make CMakeFiles/backtest_example.dir/src/indicators.cpp.o
 .PHONY : src/indicators.cpp.o
 
 src/indicators.i: src/indicators.cpp.i
@@ -287,6 +340,7 @@ src/indicators.i: src/indicators.cpp.i
 # target to preprocess a source file
 src/indicators.cpp.i:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/iris.dir/build.make CMakeFiles/iris.dir/src/indicators.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backtest_example.dir/build.make CMakeFiles/backtest_example.dir/src/indicators.cpp.i
 .PHONY : src/indicators.cpp.i
 
 src/indicators.s: src/indicators.cpp.s
@@ -295,6 +349,7 @@ src/indicators.s: src/indicators.cpp.s
 # target to generate assembly for a file
 src/indicators.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/iris.dir/build.make CMakeFiles/iris.dir/src/indicators.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backtest_example.dir/build.make CMakeFiles/backtest_example.dir/src/indicators.cpp.s
 .PHONY : src/indicators.cpp.s
 
 src/smt_analysis.o: src/smt_analysis.cpp.o
@@ -303,6 +358,7 @@ src/smt_analysis.o: src/smt_analysis.cpp.o
 # target to build an object file
 src/smt_analysis.cpp.o:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/iris.dir/build.make CMakeFiles/iris.dir/src/smt_analysis.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backtest_example.dir/build.make CMakeFiles/backtest_example.dir/src/smt_analysis.cpp.o
 .PHONY : src/smt_analysis.cpp.o
 
 src/smt_analysis.i: src/smt_analysis.cpp.i
@@ -311,6 +367,7 @@ src/smt_analysis.i: src/smt_analysis.cpp.i
 # target to preprocess a source file
 src/smt_analysis.cpp.i:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/iris.dir/build.make CMakeFiles/iris.dir/src/smt_analysis.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backtest_example.dir/build.make CMakeFiles/backtest_example.dir/src/smt_analysis.cpp.i
 .PHONY : src/smt_analysis.cpp.i
 
 src/smt_analysis.s: src/smt_analysis.cpp.s
@@ -319,6 +376,7 @@ src/smt_analysis.s: src/smt_analysis.cpp.s
 # target to generate assembly for a file
 src/smt_analysis.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/iris.dir/build.make CMakeFiles/iris.dir/src/smt_analysis.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backtest_example.dir/build.make CMakeFiles/backtest_example.dir/src/smt_analysis.cpp.s
 .PHONY : src/smt_analysis.cpp.s
 
 src/utils.o: src/utils.cpp.o
@@ -327,6 +385,7 @@ src/utils.o: src/utils.cpp.o
 # target to build an object file
 src/utils.cpp.o:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/iris.dir/build.make CMakeFiles/iris.dir/src/utils.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backtest_example.dir/build.make CMakeFiles/backtest_example.dir/src/utils.cpp.o
 .PHONY : src/utils.cpp.o
 
 src/utils.i: src/utils.cpp.i
@@ -335,6 +394,7 @@ src/utils.i: src/utils.cpp.i
 # target to preprocess a source file
 src/utils.cpp.i:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/iris.dir/build.make CMakeFiles/iris.dir/src/utils.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backtest_example.dir/build.make CMakeFiles/backtest_example.dir/src/utils.cpp.i
 .PHONY : src/utils.cpp.i
 
 src/utils.s: src/utils.cpp.s
@@ -343,6 +403,7 @@ src/utils.s: src/utils.cpp.s
 # target to generate assembly for a file
 src/utils.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/iris.dir/build.make CMakeFiles/iris.dir/src/utils.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backtest_example.dir/build.make CMakeFiles/backtest_example.dir/src/utils.cpp.s
 .PHONY : src/utils.cpp.s
 
 # Help Target
@@ -353,7 +414,11 @@ help:
 	@echo "... depend"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
+	@echo "... backtest_example"
 	@echo "... iris"
+	@echo "... examples/backtest_example.o"
+	@echo "... examples/backtest_example.i"
+	@echo "... examples/backtest_example.s"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"

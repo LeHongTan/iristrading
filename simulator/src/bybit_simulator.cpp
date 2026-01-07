@@ -6,7 +6,12 @@
 
 BybitSimulator::BybitSimulator(const SimulatorConfig& cfg) : config(cfg) {
     // Initialize random seed
-    std::srand(std::time(nullptr));
+    // Use fixed seed if provided, otherwise use time for randomness
+    if (config.randomSeed > 0) {
+        std::srand(config.randomSeed);  // Fixed seed for deterministic results
+    } else {
+        std::srand(std::time(nullptr));  // Time-based seed (non-deterministic)
+    }
 }
 
 void BybitSimulator::loadCandles(const std::vector<Candle>& candleData) {

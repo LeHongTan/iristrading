@@ -47,6 +47,9 @@ struct SimulatorConfig {
     
     // Market impact (ảnh hưởng của order lớn đến giá)
     double marketImpactFactor = 0.0001;  // 0.01% per 1% of volume
+    
+    // Random seed (0 = use time, >0 = fixed seed for deterministic results)
+    unsigned int randomSeed = 0;  // Default: non-deterministic
 };
 
 class BybitSimulator {

@@ -9,25 +9,25 @@
 #include "order.h"
 
 struct BacktestResult {
-    double initialBalance;
-    double finalBalance;
-    double totalReturn;
-    double totalReturnPercent;
-    double totalPnL;
-    double realizedPnL;
-    double unrealizedPnL;
-    double totalFees;
-    int totalTrades;
-    int winningTrades;
-    int losingTrades;
-    double winRate;
-    double averageWin;
-    double averageLoss;
-    double profitFactor;
-    double maxDrawdown;
-    double maxDrawdownPercent;
-    double sharpeRatio;
-    int bothSidesHitCount;  // Số lần quét 2 đầu
+    double initialBalance = 0.0;
+    double finalBalance = 0.0;
+    double totalReturn = 0.0;
+    double totalReturnPercent = 0.0;
+    double totalPnL = 0.0;
+    double realizedPnL = 0.0;
+    double unrealizedPnL = 0.0;
+    double totalFees = 0.0;
+    int totalTrades = 0;
+    int winningTrades = 0;
+    int losingTrades = 0;
+    double winRate = 0.0;
+    double averageWin = 0.0;
+    double averageLoss = 0.0;
+    double profitFactor = 0.0;
+    double maxDrawdown = 0.0;
+    double maxDrawdownPercent = 0.0;
+    double sharpeRatio = 0.0;
+    int bothSidesHitCount = 0;  // Số lần quét 2 đầu
     std::vector<double> equityCurve;  // Đường cong vốn
     std::vector<long long> equityTimestamps;
 };
@@ -72,6 +72,15 @@ class BacktestEngine {
         // Run backtest
         BacktestResult run(const std::string& symbol, int startIndex = 0, int endIndex = -1);
         BacktestResult runAll(const std::string& symbol);
+        
+        // Train/Test split (2/3 train, 1/3 test)
+        BacktestResult runTrainTest(const std::string& symbol, double trainRatio = 0.67);
+        
+        // Get data split indices
+        std::pair<int, int> getTrainTestSplit(const std::string& symbol, double trainRatio = 0.67);
+        
+        // Validate no data leakage (kiểm tra model không nhìn thấy future data)
+        bool validateNoDataLeakage(const std::string& symbol, int trainEndIndex, int testStartIndex);
         
         // Get current state
         TradingEngine& getTradingEngine();

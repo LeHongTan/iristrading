@@ -1,3 +1,4 @@
 /Users/tanle/Desktop/IrisTrading/build/CMakeFiles/iris.dir
+/Users/tanle/Desktop/IrisTrading/build/CMakeFiles/backtest_example.dir
 /Users/tanle/Desktop/IrisTrading/build/CMakeFiles/edit_cache.dir
 /Users/tanle/Desktop/IrisTrading/build/CMakeFiles/rebuild_cache.dir

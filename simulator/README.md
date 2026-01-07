@@ -1,4 +1,4 @@
-# Bybit Trading Simulator
+¬# Bybit Trading Simulator
 
 Môi trường giả lập giao dịch Bybit với các điều kiện khắc nghiệt hơn thực tế để training và backtesting strategies.
 
