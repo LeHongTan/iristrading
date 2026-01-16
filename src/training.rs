@@ -18,6 +18,7 @@ pub struct TrainingEngine {
     episode_count: usize,
     warmup_steps: usize,
     step_count: usize,  // Total steps across all episodes
+    equity_mtm_prev: f64,  // Previous mark-to-market equity for reward computation
 }
 
 impl TrainingEngine {
@@ -30,6 +31,7 @@ impl TrainingEngine {
         );
         
         let warmup_steps = config.training.warmup_steps;
+        let equity_mtm_prev = config.backtest.initial_balance;
         
         Self {
             config,
@@ -39,6 +41,7 @@ impl TrainingEngine {
             episode_count: 0,
             warmup_steps,
             step_count: 0,
+            equity_mtm_prev,
         }
     }
 
@@ -54,6 +57,9 @@ impl TrainingEngine {
             symbols,
             &self.config,
         );
+        
+        // Reset equity MTM tracker
+        self.equity_mtm_prev = self.config.backtest.initial_balance;
         
         let timeline_len = self.data.len();
         if timeline_len < self.warmup_steps + 10 {
@@ -102,7 +108,7 @@ impl TrainingEngine {
             let realized_pnl: f64 = pnls.values().sum();
             num_trades += pnls.len();
             
-            // Update equity
+            // Update equity with gross PnL and costs (costs are subtracted exactly once here)
             self.portfolio.update_equity(realized_pnl, cost);
             
             // 4. Mark-to-market at close(t+1) for reward calculation
@@ -114,19 +120,16 @@ impl TrainingEngine {
             }
             
             let unrealized_pnl = self.portfolio.mark_to_market(&mtm_prices);
-            let current_equity = self.portfolio.equity() + unrealized_pnl;
+            let equity_mtm_next = self.portfolio.equity() + unrealized_pnl;
             
-            // 5. Compute reward: change in equity minus costs
-            // Reward is based on equity at close(t+1)
-            let prev_equity = if step == self.warmup_steps {
-                self.config.backtest.initial_balance
-            } else {
-                // We would need to track this, but for simplicity use portfolio equity
-                self.portfolio.equity() - realized_pnl + cost
-            };
-            
-            let reward = (current_equity - prev_equity) / prev_equity.max(1.0);
+            // 5. Compute reward: true mark-to-market equity change
+            // Reward = (equity_mtm_next - equity_mtm_prev) / equity0
+            // Use initial balance as denominator for stability
+            let reward = (equity_mtm_next - self.equity_mtm_prev) / self.config.backtest.initial_balance;
             episode_reward += reward;
+            
+            // Update equity_mtm_prev for next iteration
+            self.equity_mtm_prev = equity_mtm_next;
             
             // 6. Store transition
             let done = (next_step >= timeline_len - 1) as i32;
@@ -162,7 +165,7 @@ impl TrainingEngine {
             if step % 100 == 0 {
                 debug!(
                     "Step {}/{}: Equity=${:.2}, Reward={:.6}",
-                    step, timeline_len, current_equity, reward
+                    step, timeline_len, equity_mtm_next, reward
                 );
             }
         }

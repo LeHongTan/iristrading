@@ -114,7 +114,7 @@ impl Portfolio {
     }
 
     /// Execute portfolio action at current prices
-    /// Returns total cost (fees + slippage) and individual PnLs
+    /// Returns (total_cost, gross_pnls) where gross_pnls are before cost deduction
     pub fn execute_action(
         &mut self,
         action: &PortfolioAction,
@@ -209,11 +209,12 @@ impl Portfolio {
     }
 
     /// Close an existing position for a symbol
+    /// Returns (gross_pnl, total_cost) - costs are NOT deducted from gross_pnl
     fn close_position_internal(&mut self, symbol: &str, exit_price: f64) -> (f64, f64) {
         if let Some(position) = self.positions.remove(symbol) {
             let notional = position.quantity * exit_price;
             
-            // Calculate PnL
+            // Calculate gross PnL (before costs)
             let price_diff = match position.direction {
                 Direction::Long => exit_price - position.entry_price,
                 Direction::Short => position.entry_price - exit_price,
@@ -227,9 +228,8 @@ impl Portfolio {
             let slippage_cost = notional * slippage_pct;
             let total_cost = fee_cost + slippage_cost;
             
-            let net_pnl = gross_pnl - total_cost;
-            
-            (net_pnl, total_cost)
+            // Return gross PnL and cost separately - caller subtracts cost
+            (gross_pnl, total_cost)
         } else {
             (0.0, 0.0)
         }
@@ -261,20 +261,23 @@ impl Portfolio {
     }
 
     /// Force close all positions
+    /// Returns net PnL after costs
     pub fn close_all_positions(&mut self, current_prices: &HashMap<String, f64>) -> f64 {
-        let mut total_pnl = 0.0;
+        let mut total_gross_pnl = 0.0;
+        let mut total_cost = 0.0;
         let symbols: Vec<String> = self.positions.keys().cloned().collect();
         
         for symbol in symbols {
             if let Some(&price) = current_prices.get(&symbol) {
-                let (pnl, cost) = self.close_position_internal(&symbol, price);
-                total_pnl += pnl;
-                self.equity -= cost; // Deduct closing costs
+                let (gross_pnl, cost) = self.close_position_internal(&symbol, price);
+                total_gross_pnl += gross_pnl;
+                total_cost += cost;
             }
         }
         
-        self.equity += total_pnl;
-        total_pnl
+        // Update equity with gross PnL and costs (costs subtracted exactly once)
+        self.equity += total_gross_pnl - total_cost;
+        total_gross_pnl - total_cost
     }
 
     /// Get portfolio state features for RL
