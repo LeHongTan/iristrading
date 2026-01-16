@@ -124,8 +124,9 @@ impl TrainingEngine {
             
             // 5. Compute reward: true mark-to-market equity change
             // Reward = (equity_mtm_next - equity_mtm_prev) / equity0
-            // Use initial balance as denominator for stability
-            let reward = (equity_mtm_next - self.equity_mtm_prev) / self.config.backtest.initial_balance;
+            // Use initial balance as denominator for stability (with safeguard)
+            let denominator = self.config.backtest.initial_balance.max(1.0);
+            let reward = (equity_mtm_next - self.equity_mtm_prev) / denominator;
             episode_reward += reward;
             
             // Update equity_mtm_prev for next iteration

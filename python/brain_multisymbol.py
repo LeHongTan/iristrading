@@ -216,11 +216,12 @@ class MultiSymbolActorCritic(nn.Module):
                 size = size_dist.sample()
             
             # Clamp size to avoid log(0) or log(1-1) = log(0) in Beta log_prob
+            # Use the same clamped value for both log_prob and execution to maintain policy gradient consistency
             size_clamped = size.clamp(eps, 1.0 - eps)
             size_log_prob = size_dist.log_prob(size_clamped)
             
             directions.append(direction)
-            sizes.append(size)  # Store unclamped for execution
+            sizes.append(size_clamped)  # Store clamped value for consistency
             log_probs.append(dir_log_prob + size_log_prob)
         
         # Total log prob is sum across symbols
