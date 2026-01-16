@@ -119,6 +119,18 @@ The importer automatically validates:
 
 **Timezone:** All timestamps should be in UTC.
 
+#### Generate Sample Data (For Testing)
+
+If you don't have real historical data, use the provided script to generate sample CSV files:
+
+```bash
+# Generate 5000 candles for all 5 symbols
+python3 scripts/generate_sample_csv.py --output data/ --count 5000
+
+# Import the generated data
+cargo run --release -- --mode import --dir data/
+```
+
 ### Training Mode
 
 Train the RL agent on historical data:
