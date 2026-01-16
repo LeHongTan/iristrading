@@ -1,0 +1,17 @@
+.env
+*target
+*.lock
+*.sqlite3
+*.db
+__pycache__/
+*.pycß
+*.pyo
+*.pyd
+*.swp
+*.swo
+.idea/
+.vscode/
+.DS_Store
+logs/   
+*.log
+*.venv
