@@ -775,19 +775,28 @@ fn import_csv_file(csv_path: &str, default_symbol: &str) -> Result<(String, Vec<
             .parse()
             .with_context(|| format!("Invalid timestamp at row {}", idx + 1))?;
 
+        // Threshold for detecting seconds vs milliseconds (approx year 2096)
+        const TIMESTAMP_SECONDS_THRESHOLD: i64 = 4_000_000_000;
+        
         // If timestamp looks like seconds (< year 2100 in seconds), convert to ms
-        if timestamp < 4_000_000_000 {
+        if timestamp < TIMESTAMP_SECONDS_THRESHOLD {
             timestamp *= 1000;
         }
 
         // Validation: monotonic timestamps
         if let Some(prev_ts) = prev_timestamp {
-            if timestamp <= prev_ts {
+            if timestamp < prev_ts {
                 warn!(
                     "Row {}: Non-monotonic timestamp {} (previous: {})",
                     idx + 1,
                     timestamp,
                     prev_ts
+                );
+            } else if timestamp == prev_ts {
+                warn!(
+                    "Row {}: Duplicate timestamp {} (same as previous)",
+                    idx + 1,
+                    timestamp
                 );
             }
         }
