@@ -15,15 +15,20 @@ mod risk;
 mod config;
 mod data_loader;
 mod portfolio;
+mod training;
 
 use database::{generate_sample_data, BacktestResult, Database};
 use ict::{calculate_ict_features, find_fvg, find_order_block, Candle, FVGType, OrderBlockType};
 use risk::{BacktestMetrics, RiskManager};
+use config::Config;
+use data_loader::MultiSymbolData;
+use training::{PythonBrain as MultiSymbolBrain, TrainingEngine};
 
 #[derive(Debug, Clone, ValueEnum)]
 enum TradingMode {
     Live,
     Backtest,
+    Train,
 }
 
 #[derive(Parser, Debug)]
@@ -524,6 +529,109 @@ fn run_backtest_mode(args: &Args, db: &Database, brain: &PythonBrain) -> Result<
     Ok(())
 }
 
+fn run_train_mode(args: &Args, db: &Database) -> Result<()> {
+    info!("Starting TRAINING mode for multi-symbol portfolio");
+    
+    // Load configuration
+    let config_path = std::env::var("CONFIG_PATH")
+        .unwrap_or_else(|_| Config::default_path().to_string());
+    
+    let config = if std::path::Path::new(&config_path).exists() {
+        Config::load(&config_path)?
+    } else {
+        info!("Config file not found, using defaults");
+        Config::default()
+    };
+    
+    info!("Configuration loaded:");
+    info!("  Symbols: {:?}", config.symbols.list);
+    info!("  Sequence length: {}", config.model.sequence_length);
+    info!("  Initial balance: ${:.2}", config.backtest.initial_balance);
+    info!("  Max episodes: {}", config.training.max_episodes);
+    
+    // Load or generate data for all symbols
+    info!("Loading historical data for all symbols...");
+    let mut all_symbols_have_data = true;
+    
+    for symbol in &config.symbols.list {
+        let candles = db.load_history(symbol, Some(config.backtest.max_candles_per_symbol))?;
+        if candles.is_empty() {
+            info!("No data for {}, generating sample data", symbol);
+            all_symbols_have_data = false;
+            
+            // Generate sample data with different base prices
+            let base_price = match symbol.as_str() {
+                "BTCUSDT" => 42000.0,
+                "ETHUSDT" => 2200.0,
+                "SOLUSDT" => 100.0,
+                "BNBUSDT" => 300.0,
+                "XRPUSDT" => 0.6,
+                _ => 1000.0,
+            };
+            
+            let sample = generate_sample_data(config.backtest.max_candles_per_symbol, base_price);
+            db.save_candles(symbol, &sample)?;
+            info!("Generated {} sample candles for {}", sample.len(), symbol);
+        } else {
+            info!("Loaded {} candles for {}", candles.len(), symbol);
+        }
+    }
+    
+    // Load multi-symbol data with alignment
+    let data = MultiSymbolData::load(
+        db,
+        &config.symbols.list,
+        Some(config.backtest.max_candles_per_symbol),
+    )?;
+    
+    info!("Multi-symbol data loaded: {} timestamps aligned", data.len());
+    
+    // Initialize Python brain
+    info!("Initializing Python multi-symbol brain...");
+    let python_brain = MultiSymbolBrain::new(&config)?;
+    
+    // Try to load existing checkpoint
+    let checkpoint_path = "checkpoints/model_latest.pt";
+    if std::path::Path::new(checkpoint_path).exists() {
+        info!("Loading checkpoint from {}", checkpoint_path);
+        python_brain.load(checkpoint_path)?;
+    } else {
+        info!("No checkpoint found, starting fresh");
+    }
+    
+    // Create training engine
+    let mut engine = TrainingEngine::new(config.clone(), data);
+    
+    info!("Starting training loop...");
+    
+    for episode in 0..config.training.max_episodes {
+        let stats = engine.run_episode(&python_brain)?;
+        
+        let return_pct = ((stats.final_equity / stats.initial_equity) - 1.0) * 100.0;
+        info!(
+            "Episode {}/{}: Return={:.2}%, Final Equity=${:.2}, Trades={}",
+            episode + 1,
+            config.training.max_episodes,
+            return_pct,
+            stats.final_equity,
+            stats.num_trades,
+        );
+        
+        // Save checkpoint periodically
+        if (episode + 1) % config.training.save_interval == 0 {
+            std::fs::create_dir_all("checkpoints")?;
+            let checkpoint_path = format!("checkpoints/model_episode_{}.pt", episode + 1);
+            python_brain.save(&checkpoint_path)?;
+            python_brain.save("checkpoints/model_latest.pt")?;
+            info!("Checkpoint saved: {}", checkpoint_path);
+        }
+    }
+    
+    info!("Training complete!");
+    
+    Ok(())
+}
+
 #[tokio::main]
 async fn main() -> Result<()> {
     tracing_subscriber::fmt()
@@ -544,6 +652,7 @@ async fn main() -> Result<()> {
     match args.mode {
         TradingMode::Live => run_live_mode(&args, &db, &brain).await?,
         TradingMode::Backtest => run_backtest_mode(&args, &db, &brain)?,
+        TradingMode::Train => run_train_mode(&args, &db)?,
     }
 
     Ok(())
