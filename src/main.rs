@@ -29,6 +29,7 @@ enum TradingMode {
     Live,
     Backtest,
     Train,
+    Import,
 }
 
 #[derive(Parser, Debug)]
@@ -49,6 +50,16 @@ struct Args {
 
     #[arg(long, default_value = "500")]
     candles: usize,
+
+    // Import mode arguments
+    #[arg(long, help = "Path to CSV file for import (required for import mode)")]
+    csv: Option<String>,
+
+    #[arg(long, help = "Directory containing CSV files for batch import")]
+    dir: Option<String>,
+
+    #[arg(long, help = "Timeframe for imported data (e.g., 5m, 1h)")]
+    timeframe: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -630,6 +641,206 @@ fn run_train_mode(_args: &Args, db: &Database) -> Result<()> {
     Ok(())
 }
 
+fn run_import_mode(args: &Args, db: &Database) -> Result<()> {
+    info!("Starting IMPORT mode");
+
+    // Validate input arguments
+    if args.csv.is_none() && args.dir.is_none() {
+        return Err(anyhow!(
+            "Import mode requires either --csv <file> or --dir <directory>"
+        ));
+    }
+
+    let mut imported_count = 0;
+    let mut total_candles = 0;
+
+    // Import from single CSV file
+    if let Some(csv_path) = &args.csv {
+        info!("Importing data from CSV: {}", csv_path);
+        let (symbol, candles) = import_csv_file(csv_path, &args.symbol)?;
+        let count = db.save_candles(&symbol, &candles)?;
+        info!(
+            "✓ Imported {} candles for {} from {}",
+            count, symbol, csv_path
+        );
+        imported_count += 1;
+        total_candles += count;
+    }
+
+    // Import from directory (batch mode)
+    if let Some(dir_path) = &args.dir {
+        info!("Importing data from directory: {}", dir_path);
+        let dir_entries = std::fs::read_dir(dir_path)
+            .context("Failed to read directory")?;
+
+        for entry in dir_entries {
+            let entry = entry?;
+            let path = entry.path();
+
+            if path.is_file() {
+                if let Some(ext) = path.extension() {
+                    if ext == "csv" {
+                        let file_path = path.to_string_lossy().to_string();
+                        
+                        // Extract symbol from filename (e.g., BTCUSDT.csv -> BTCUSDT)
+                        let symbol = path
+                            .file_stem()
+                            .and_then(|s| s.to_str())
+                            .unwrap_or(&args.symbol)
+                            .to_string();
+
+                        match import_csv_file(&file_path, &symbol) {
+                            Ok((sym, candles)) => {
+                                match db.save_candles(&sym, &candles) {
+                                    Ok(count) => {
+                                        info!("✓ Imported {} candles for {} from {}", count, sym, file_path);
+                                        imported_count += 1;
+                                        total_candles += count;
+                                    }
+                                    Err(e) => {
+                                        warn!("✗ Failed to save candles for {}: {}", sym, e);
+                                    }
+                                }
+                            }
+                            Err(e) => {
+                                warn!("✗ Failed to import {}: {}", file_path, e);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    info!("═══════════════════════════════════════");
+    info!("Import Summary:");
+    info!("  Files processed: {}", imported_count);
+    info!("  Total candles imported: {}", total_candles);
+    info!("═══════════════════════════════════════");
+
+    Ok(())
+}
+
+/// Import candles from a CSV file
+/// CSV format: timestamp,open,high,low,close,volume
+/// Timestamp can be in milliseconds or seconds (auto-detected)
+fn import_csv_file(csv_path: &str, default_symbol: &str) -> Result<(String, Vec<Candle>)> {
+    use std::fs::File;
+
+    let file = File::open(csv_path)
+        .with_context(|| format!("Failed to open CSV file: {}", csv_path))?;
+
+    let mut reader = csv::ReaderBuilder::new()
+        .has_headers(true)
+        .from_reader(file);
+
+    let mut candles = Vec::new();
+    let mut prev_timestamp: Option<i64> = None;
+
+    // Try to extract symbol from first column if it exists, otherwise use default
+    let symbol = default_symbol.to_string();
+
+    for (idx, result) in reader.records().enumerate() {
+        let record = result.with_context(|| format!("Failed to read CSV row {}", idx + 1))?;
+
+        if record.len() < 6 {
+            warn!(
+                "Row {} has only {} fields, expected at least 6 (timestamp,open,high,low,close,volume)",
+                idx + 1,
+                record.len()
+            );
+            continue;
+        }
+
+        // Parse fields
+        let timestamp_str = &record[0];
+        let open: f64 = record[1]
+            .parse()
+            .with_context(|| format!("Invalid open price at row {}", idx + 1))?;
+        let high: f64 = record[2]
+            .parse()
+            .with_context(|| format!("Invalid high price at row {}", idx + 1))?;
+        let low: f64 = record[3]
+            .parse()
+            .with_context(|| format!("Invalid low price at row {}", idx + 1))?;
+        let close: f64 = record[4]
+            .parse()
+            .with_context(|| format!("Invalid close price at row {}", idx + 1))?;
+        let volume: f64 = record[5]
+            .parse()
+            .with_context(|| format!("Invalid volume at row {}", idx + 1))?;
+
+        // Parse timestamp (auto-detect if it's in seconds or milliseconds)
+        let mut timestamp: i64 = timestamp_str
+            .parse()
+            .with_context(|| format!("Invalid timestamp at row {}", idx + 1))?;
+
+        // If timestamp looks like seconds (< year 2100 in seconds), convert to ms
+        if timestamp < 4_000_000_000 {
+            timestamp *= 1000;
+        }
+
+        // Validation: monotonic timestamps
+        if let Some(prev_ts) = prev_timestamp {
+            if timestamp <= prev_ts {
+                warn!(
+                    "Row {}: Non-monotonic timestamp {} (previous: {})",
+                    idx + 1,
+                    timestamp,
+                    prev_ts
+                );
+            }
+        }
+        prev_timestamp = Some(timestamp);
+
+        // Validation: OHLC sanity checks
+        if open < 0.0 || high < 0.0 || low < 0.0 || close < 0.0 || volume < 0.0 {
+            return Err(anyhow!("Row {}: Negative values not allowed", idx + 1));
+        }
+
+        if high < open.max(close) {
+            warn!(
+                "Row {}: High ({}) is less than max(open, close) ({})",
+                idx + 1,
+                high,
+                open.max(close)
+            );
+        }
+
+        if low > open.min(close) {
+            warn!(
+                "Row {}: Low ({}) is greater than min(open, close) ({})",
+                idx + 1,
+                low,
+                open.min(close)
+            );
+        }
+
+        candles.push(Candle {
+            timestamp,
+            open,
+            high,
+            low,
+            close,
+            volume,
+        });
+    }
+
+    if candles.is_empty() {
+        return Err(anyhow!("No valid candles found in CSV file"));
+    }
+
+    info!(
+        "Parsed {} candles from {} (first: {}, last: {})",
+        candles.len(),
+        csv_path,
+        candles.first().map(|c| c.timestamp).unwrap_or(0),
+        candles.last().map(|c| c.timestamp).unwrap_or(0)
+    );
+
+    Ok((symbol, candles))
+}
+
 #[tokio::main]
 async fn main() -> Result<()> {
     tracing_subscriber::fmt()
@@ -644,13 +855,20 @@ async fn main() -> Result<()> {
     info!("Initializing database: {}", args.database);
     let db = Database::new(&args.database)?;
 
-    info!("Initializing Python AI Brain...");
-    let brain = PythonBrain::new()?;
-
+    // Only initialize Python brain for modes that need it
     match args.mode {
-        TradingMode::Live => run_live_mode(&args, &db, &brain).await?,
-        TradingMode::Backtest => run_backtest_mode(&args, &db, &brain)?,
+        TradingMode::Live => {
+            info!("Initializing Python AI Brain...");
+            let brain = PythonBrain::new()?;
+            run_live_mode(&args, &db, &brain).await?
+        }
+        TradingMode::Backtest => {
+            info!("Initializing Python AI Brain...");
+            let brain = PythonBrain::new()?;
+            run_backtest_mode(&args, &db, &brain)?
+        }
         TradingMode::Train => run_train_mode(&args, &db)?,
+        TradingMode::Import => run_import_mode(&args, &db)?,
     }
 
     Ok(())

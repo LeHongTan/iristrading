@@ -62,6 +62,63 @@ cargo build --release
 
 ## Usage
 
+### Data Import Mode
+
+Before training, import real historical candle data into the database:
+
+#### Import Single Symbol
+
+```bash
+cargo run --release -- --mode import --symbol BTCUSDT --csv data/BTCUSDT.csv
+```
+
+#### Import Multiple Symbols (Batch)
+
+Place your CSV files in a directory (e.g., `data/`) with filenames matching symbol names:
+```
+data/
+  BTCUSDT.csv
+  ETHUSDT.csv
+  SOLUSDT.csv
+  BNBUSDT.csv
+  XRPUSDT.csv
+```
+
+Then import all at once:
+```bash
+cargo run --release -- --mode import --dir data/
+```
+
+#### CSV Format
+
+Your CSV files should have the following format (with or without header):
+
+```csv
+timestamp,open,high,low,close,volume
+1704067200000,42150.5,42200.0,42100.0,42180.5,125.43
+1704067500000,42180.5,42250.0,42150.0,42230.0,98.76
+1704067800000,42230.0,42280.0,42210.0,42265.5,110.22
+...
+```
+
+**Field Descriptions:**
+- `timestamp`: Unix timestamp in milliseconds (or seconds - auto-detected)
+- `open`: Opening price
+- `high`: Highest price in period
+- `low`: Lowest price in period  
+- `close`: Closing price
+- `volume`: Trading volume
+
+**Validation:**
+The importer automatically validates:
+- Timestamps are monotonically increasing
+- No negative OHLC values
+- High >= max(open, close)
+- Low <= min(open, close)
+- Warnings for anomalies (non-fatal)
+
+**Timezone:** All timestamps should be in UTC.
+
 ### Training Mode
 
 Train the RL agent on historical data:
@@ -69,6 +126,9 @@ Train the RL agent on historical data:
 ```bash
 # Activate Python venv first (required for PyTorch)
 source .venv/bin/activate
+
+# Import data for all 5 symbols first (if not done already)
+cargo run --release -- --mode import --dir data/
 
 # Run training
 VIRTUAL_ENV=$PWD/.venv cargo run --release -- --mode train
