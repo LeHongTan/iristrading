@@ -12,6 +12,9 @@ use tracing::{debug, error, info, warn};
 mod database;
 mod ict;
 mod risk;
+mod config;
+mod data_loader;
+mod portfolio;
 
 use database::{generate_sample_data, BacktestResult, Database};
 use ict::{calculate_ict_features, find_fvg, find_order_block, Candle, FVGType, OrderBlockType};
