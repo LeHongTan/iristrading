@@ -190,6 +190,7 @@ class MultiSymbolActorCritic(nn.Module):
         directions = []
         sizes = []
         log_probs = []
+        eps = 1e-6  # Small epsilon for clamping to avoid log(0) in Beta distribution
         
         for i in range(self.num_symbols):
             # Direction (categorical)
@@ -214,10 +215,12 @@ class MultiSymbolActorCritic(nn.Module):
             else:
                 size = size_dist.sample()
             
-            size_log_prob = size_dist.log_prob(size)
+            # Clamp size to avoid log(0) or log(1-1) = log(0) in Beta log_prob
+            size_clamped = size.clamp(eps, 1.0 - eps)
+            size_log_prob = size_dist.log_prob(size_clamped)
             
             directions.append(direction)
-            sizes.append(size)
+            sizes.append(size)  # Store unclamped for execution
             log_probs.append(dir_log_prob + size_log_prob)
         
         # Total log prob is sum across symbols
@@ -426,6 +429,9 @@ class MultiSymbolPPOAgent:
         
         policy_losses = []
         value_losses = []
+        entropies = []
+        total_losses = []
+        eps = 1e-6  # Small epsilon for clamping
         
         for _ in range(epochs):
             batches = self.memory.get_batches(batch_size)
@@ -454,27 +460,35 @@ class MultiSymbolPPOAgent:
                     batch_symbol_seqs, batch_portfolio
                 )
                 
-                # Compute new log probs
+                # Compute new log probs and entropy
                 new_log_probs = []
+                entropy_list = []
                 for b in range(len(batch_indices)):
                     symbol_log_probs = []
+                    symbol_entropies = []
                     for s in range(self.num_symbols):
                         # Direction
                         dir_probs = F.softmax(direction_logits[s][b:b+1], dim=-1)
                         dir_dist = torch.distributions.Categorical(dir_probs)
                         dir_lp = dir_dist.log_prob(torch.tensor([batch_dirs[b][s]]).to(self.device))
+                        dir_entropy = dir_dist.entropy()
                         
-                        # Size
+                        # Size - clamp to avoid numerical issues
                         alpha = size_alphas[s][b].squeeze() 
                         beta = size_betas[s][b].squeeze()
                         size_dist = torch.distributions.Beta(alpha, beta)
-                        size_lp = size_dist.log_prob(torch.tensor([batch_sizes[b][s]]).to(self.device))
+                        size_value = torch.tensor([batch_sizes[b][s]]).to(self.device).clamp(eps, 1.0 - eps)
+                        size_lp = size_dist.log_prob(size_value)
+                        size_entropy = size_dist.entropy()
                         
                         symbol_log_probs.append(dir_lp + size_lp)
+                        symbol_entropies.append(dir_entropy + size_entropy)
                     
                     new_log_probs.append(torch.stack(symbol_log_probs).sum())
+                    entropy_list.append(torch.stack(symbol_entropies).sum())
                 
                 new_log_probs = torch.stack(new_log_probs)
+                batch_entropy = torch.stack(entropy_list).mean()
                 
                 batch_old_log_probs = old_log_probs[batch_indices]
                 batch_advantages = advantages_tensor[batch_indices]
@@ -488,7 +502,8 @@ class MultiSymbolPPOAgent:
                 
                 value_loss = F.mse_loss(values.squeeze(), batch_returns)
                 
-                loss = policy_loss + self.value_coef * value_loss
+                # Total loss includes entropy bonus (negative entropy to encourage exploration)
+                loss = policy_loss + self.value_coef * value_loss - self.entropy_coef * batch_entropy
                 
                 self.optimizer.zero_grad()
                 loss.backward()
@@ -497,6 +512,8 @@ class MultiSymbolPPOAgent:
                 
                 policy_losses.append(policy_loss.item())
                 value_losses.append(value_loss.item())
+                entropies.append(batch_entropy.item())
+                total_losses.append(loss.item())
         
         self.memory.clear()
         self.training_step += 1
@@ -504,6 +521,8 @@ class MultiSymbolPPOAgent:
         return {
             'policy_loss': np.mean(policy_losses) if policy_losses else 0.0,
             'value_loss': np.mean(value_losses) if value_losses else 0.0,
+            'entropy': np.mean(entropies) if entropies else 0.0,
+            'total_loss': np.mean(total_losses) if total_losses else 0.0,
         }
     
     def save(self, path):
