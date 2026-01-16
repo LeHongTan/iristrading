@@ -529,7 +529,7 @@ fn run_backtest_mode(args: &Args, db: &Database, brain: &PythonBrain) -> Result<
     Ok(())
 }
 
-fn run_train_mode(args: &Args, db: &Database) -> Result<()> {
+fn run_train_mode(_args: &Args, db: &Database) -> Result<()> {
     info!("Starting TRAINING mode for multi-symbol portfolio");
     
     // Load configuration
@@ -551,13 +551,11 @@ fn run_train_mode(args: &Args, db: &Database) -> Result<()> {
     
     // Load or generate data for all symbols
     info!("Loading historical data for all symbols...");
-    let mut all_symbols_have_data = true;
     
     for symbol in &config.symbols.list {
         let candles = db.load_history(symbol, Some(config.backtest.max_candles_per_symbol))?;
         if candles.is_empty() {
             info!("No data for {}, generating sample data", symbol);
-            all_symbols_have_data = false;
             
             // Generate sample data with different base prices
             let base_price = match symbol.as_str() {

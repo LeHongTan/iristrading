@@ -176,7 +176,7 @@ impl TrainingEngine {
             }
         }
         
-        let final_pnl = self.portfolio.close_all_positions(&final_prices);
+        let _final_pnl = self.portfolio.close_all_positions(&final_prices);
         let final_equity = self.portfolio.equity();
         
         self.episode_count += 1;
