@@ -234,6 +234,41 @@ Before deployment:
 
 ## How to Run Tests
 
+### Unit Tests
+
+The codebase now includes automated unit tests for core functionality:
+
+```bash
+# Run all tests
+cargo test
+
+# Run specific test
+cargo test test_cost_subtracted_once
+cargo test test_reward_equals_delta_equity_mtm
+cargo test test_no_lookahead_invariant
+```
+
+**Current Test Coverage:**
+
+1. **test_cost_subtracted_once** - Validates that trading costs (fees + slippage) are deducted from equity exactly once, not double-counted. This test ensures:
+   - Opening costs are applied correctly
+   - Closing positions returns gross PnL (before costs)
+   - `update_equity()` subtracts costs exactly once
+   - Final equity calculation is accurate
+
+2. **test_reward_equals_delta_equity_mtm** - Verifies that reward calculation equals the change in mark-to-market equity:
+   - Tracks equity MTM before and after trades
+   - Validates reward = (equity_mtm_next - equity_mtm_prev) / equity0
+   - Ensures costs and unrealized PnL are properly accounted for
+
+3. **test_no_lookahead_invariant** - Structural test confirming that portfolio methods don't require future data:
+   - State at step t uses only data <= t
+   - Execution at step t+1 uses open(t+1)
+   - Reward calculation uses close(t+1)
+   - Validates the no-lookahead design by construction
+
+### Integration Tests
+
 Since unit tests are minimal (Rust binary-only project), most validation is integration-style:
 
 ### Validation Run
