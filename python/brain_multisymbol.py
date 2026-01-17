@@ -417,11 +417,12 @@ class MultiSymbolPPOAgent:
             next_value
         )
         
-        # Convert to tensors (simplified - in practice need to handle sequences properly)
+        # Convert to tensors
         old_log_probs = torch.FloatTensor(self.memory.log_probs).to(self.device)
         advantages_tensor = torch.FloatTensor(advantages).to(self.device)
         returns_tensor = torch.FloatTensor(returns).to(self.device)
         
+        # Normalize advantages
         advantages_tensor = (advantages_tensor - advantages_tensor.mean()) / (advantages_tensor.std() + 1e-8)
         
         policy_losses = []
@@ -486,7 +487,10 @@ class MultiSymbolPPOAgent:
                 surr2 = torch.clamp(ratio, 1 - self.clip_epsilon, 1 + self.clip_epsilon) * batch_advantages
                 policy_loss = -torch.min(surr1, surr2).mean()
                 
-                value_loss = F.mse_loss(values.squeeze(), batch_returns)
+                # --- FIX APPLIED BELOW ---
+                # Explicitly reshape both to 1D vectors to prevent shape mismatch [Batch, 1] vs [Batch]
+                value_loss = F.mse_loss(values.reshape(-1), batch_returns.reshape(-1))
+                # -------------------------
                 
                 loss = policy_loss + self.value_coef * value_loss
                 
