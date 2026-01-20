@@ -3,6 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
 import os
+import platform
 
 class ActorCritic(nn.Module):
     def __init__(self, state_dim=20, hidden_dim=256, action_dim=3):
@@ -100,9 +101,11 @@ class PPOAgent:
                  lr=3e-4, gamma=0.99, gae_lambda=0.95, 
                  clip_epsilon=0.2, entropy_coef=0.01, value_coef=0.5):
         
-        if torch.backends.mps.is_available():
-            self.device = torch.device("mps")
-            print("[AI Brain] Using Apple Silicon MPS acceleration")
+        system = platform.system()
+        
+        if system == 'Darwin':
+            self.device = torch.device("cpu")
+            print("[AI Brain] Detected macOS - Using CPU (Optimized for RL/PPO)")
         elif torch.cuda.is_available():
             self.device = torch.device("cuda")
             print("[AI Brain] Using CUDA acceleration")

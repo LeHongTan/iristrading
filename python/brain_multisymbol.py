@@ -501,7 +501,7 @@ class MultiSymbolPPOAgent:
                 surr2 = torch.clamp(ratio, 1 - self.clip_epsilon, 1 + self.clip_epsilon) * batch_advantages
                 policy_loss = -torch.min(surr1, surr2).mean()
                 
-                value_loss = F.mse_loss(values.squeeze(), batch_returns)
+                value_loss = F.mse_loss(values.view(-1), batch_returns.view(-1))
                 
                 # Total loss includes entropy bonus (negative entropy to encourage exploration)
                 loss = policy_loss + self.value_coef * value_loss - self.entropy_coef * batch_entropy

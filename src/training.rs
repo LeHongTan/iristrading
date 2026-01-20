@@ -362,8 +362,8 @@ impl PythonBrain {
                 .map_err(|e| anyhow!("Failed to set num_symbols: {}", e))?;
             init_kwargs.set_item("sequence_length", config.model.sequence_length)
                 .map_err(|e| anyhow!("Failed to set sequence_length: {}", e))?;
-            init_kwargs.set_item("features_per_symbol", config.model.features_per_symbol)
-                .map_err(|e| anyhow!("Failed to set features_per_symbol: {}", e))?;
+            init_kwargs.set_item("features_per_timestep", config.model.features_per_symbol)
+                .map_err(|e| anyhow!("Failed to set features_per_timestep: {}", e))?;
             init_kwargs.set_item("hidden_dim", config.model.hidden_dim)
                 .map_err(|e| anyhow!("Failed to set hidden_dim: {}", e))?;
             
