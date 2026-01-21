@@ -21,6 +21,7 @@ impl Database {
             "CREATE TABLE IF NOT EXISTS candles (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 symbol TEXT NOT NULL,
+                timeframe TEXT NOT NULL,
                 timestamp INTEGER NOT NULL,
                 open REAL NOT NULL,
                 high REAL NOT NULL,
@@ -28,14 +29,14 @@ impl Database {
                 close REAL NOT NULL,
                 volume REAL NOT NULL,
                 created_at TEXT DEFAULT CURRENT_TIMESTAMP,
-                UNIQUE(symbol, timestamp)
+                UNIQUE(symbol, timeframe, timestamp)
             )",
             [],
         )?;
 
         self.conn.execute(
             "CREATE INDEX IF NOT EXISTS idx_candles_symbol_time
-             ON candles(symbol, timestamp DESC)",
+             ON candles(symbol, timeframe, timestamp DESC)",
             [],
         )?;
 
@@ -61,14 +62,14 @@ impl Database {
         Ok(())
     }
 
-    pub fn save_candle(&self, symbol: &str, candle: &Candle) -> Result<()> {
-        // Fix: remove "? 4" spacing
+    pub fn save_candle(&self, symbol: &str, timeframe: &str, candle: &Candle) -> Result<()> {
         self.conn.execute(
             "INSERT OR REPLACE INTO candles
-             (symbol, timestamp, open, high, low, close, volume)
-             VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)",
+             (symbol, timeframe, timestamp, open, high, low, close, volume)
+             VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)",
             params![
                 symbol,
+                timeframe,
                 candle.timestamp,
                 candle.open,
                 candle.high,
@@ -80,17 +81,18 @@ impl Database {
         Ok(())
     }
 
-    pub fn save_candles(&self, symbol: &str, candles: &[Candle]) -> Result<usize> {
+    pub fn save_candles(&self, symbol: &str, timeframe: &str, candles: &[Candle]) -> Result<usize> {
         let tx = self.conn.unchecked_transaction()?;
         let mut count = 0usize;
 
         for candle in candles {
             tx.execute(
                 "INSERT OR REPLACE INTO candles
-                 (symbol, timestamp, open, high, low, close, volume)
-                 VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)",
+                 (symbol, timeframe, timestamp, open, high, low, close, volume)
+                 VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)",
                 params![
                     symbol,
+                    timeframe,
                     candle.timestamp,
                     candle.open,
                     candle.high,
@@ -106,12 +108,18 @@ impl Database {
         Ok(count)
     }
 
-    pub fn load_history(&self, symbol: &str, limit: Option<usize>) -> Result<Vec<Candle>> {
+    /// Truy vấn lịch sử cho 1 symbol, 1 timeframe
+    pub fn load_history_symbol_tf(
+        &self,
+        symbol: &str,
+        timeframe: &str,
+        limit: Option<usize>,
+    ) -> Result<Vec<Candle>> {
         let query = match limit {
             Some(n) => format!(
                 "SELECT timestamp, open, high, low, close, volume
                  FROM candles
-                 WHERE symbol = ?1
+                 WHERE symbol = ?1 AND timeframe = ?2
                  ORDER BY timestamp ASC
                  LIMIT {}",
                 n
@@ -119,14 +127,14 @@ impl Database {
             None => String::from(
                 "SELECT timestamp, open, high, low, close, volume
                  FROM candles
-                 WHERE symbol = ?1
+                 WHERE symbol = ?1 AND timeframe = ?2
                  ORDER BY timestamp ASC",
             ),
         };
 
         let mut stmt = self.conn.prepare(&query)?;
         let candles = stmt
-            .query_map(params![symbol], |row| {
+            .query_map(params![symbol, timeframe], |row| {
                 Ok(Candle {
                     timestamp: row.get(0)?,
                     open: row.get(1)?,
@@ -140,87 +148,4 @@ impl Database {
 
         Ok(candles)
     }
-
-    pub fn save_backtest_result(&self, result: &BacktestResult) -> Result<i64> {
-        self.conn.execute(
-            "INSERT INTO backtest_results
-             (run_id, symbol, start_time, end_time, initial_balance, final_balance,
-              total_trades, winning_trades, losing_trades, max_drawdown, sharpe_ratio)
-             VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11)",
-            params![
-                result.run_id,
-                result.symbol,
-                result.start_time,
-                result.end_time,
-                result.initial_balance,
-                result.final_balance,
-                result.total_trades,
-                result.winning_trades,
-                result.losing_trades,
-                result.max_drawdown,
-                result.sharpe_ratio
-            ],
-        )?;
-        Ok(self.conn.last_insert_rowid())
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct BacktestResult {
-    pub run_id: String,
-    pub symbol: String,
-    pub start_time: i64,
-    pub end_time: i64,
-    pub initial_balance: f64,
-    pub final_balance: f64,
-    pub total_trades: i64,
-    pub winning_trades: i64,
-    pub losing_trades: i64,
-    pub max_drawdown: f64,
-    pub sharpe_ratio: Option<f64>,
-}
-
-pub fn generate_sample_data(count: usize, start_price: f64) -> Vec<Candle> {
-    use std::time::{SystemTime, UNIX_EPOCH};
-
-    let mut candles = Vec::with_capacity(count);
-    let now = SystemTime::now()
-        .duration_since(UNIX_EPOCH)
-        .unwrap()
-        .as_millis() as i64;
-
-    let mut price = start_price;
-    let volatility = 0.002;
-
-    for i in 0..count {
-        let timestamp = now - ((count - i) as i64 * 60_000);
-
-        let change = (rand_simple(i) - 0.5) * volatility * price;
-        let open = price;
-        price += change;
-        let close = price;
-
-        let high = open.max(close) * (1.0 + rand_simple(i + 1000) * 0.001);
-        let low = open.min(close) * (1.0 - rand_simple(i + 2000) * 0.001);
-        let volume = 100.0 + rand_simple(i + 3000) * 1000.0;
-
-        candles.push(Candle {
-            timestamp,
-            open,
-            high,
-            low,
-            close,
-            volume,
-        });
-    }
-
-    candles
-}
-
-fn rand_simple(seed: usize) -> f64 {
-    let x = ((seed as u64)
-        .wrapping_mul(1103515245)
-        .wrapping_add(12345))
-        % (1 << 31);
-    (x as f64) / (1u64 << 31) as f64
 }

@@ -3,7 +3,7 @@
 [symbols]
 # List of perpetual symbols to trade
 list = ["BTCUSDT", "ETHUSDT", "SOLUSDT", "BNBUSDT", "XRPUSDT"]
-timeframe = "5m"
+timeframes = ["1m", "5m", "1h", "4h"]
 
 [model]
 # Sequence length for temporal context

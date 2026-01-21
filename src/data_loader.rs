@@ -1,153 +1,128 @@
 use anyhow::{anyhow, Result};
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use crate::ict::Candle;
 use crate::database::Database;
 
-/// Multi-symbol data loader with timestamp alignment
+/// Data loader: multi-symbol & multi-timeframe (align theo anchor timeframe nhỏ nhất)
 #[derive(Debug)]
-pub struct MultiSymbolData {
-    /// Map from symbol to sorted candles
-    data: HashMap<String, Vec<Candle>>,
-    /// Unified timeline of timestamps across all symbols
-    timeline: Vec<i64>,
-    /// Map from timestamp to index in each symbol's data
-    indices: HashMap<String, HashMap<i64, usize>>,
+pub struct MultiSymbolMultiTFData {
+    /// data[symbol][timeframe] = Vec<Candle>
+    data: HashMap<String, HashMap<String, Vec<Candle>>>,
+    /// anchor_timeline: vector timestamp của khung nhỏ nhất (ví dụ: 1m)
+    anchor_timeline: Vec<i64>,
+    /// mapping[symbol][timeframe][timestamp] = idx in Vec<Candle>
+    indices: HashMap<String, HashMap<String, HashMap<i64, usize>>>,
+    /// Danh sách all symbol, tf
+    symbols: Vec<String>,
+    timeframes: Vec<String>,
 }
 
-impl MultiSymbolData {
-    /// Load historical data for multiple symbols with timestamp alignment
-    pub fn load(db: &Database, symbols: &[String], max_candles: Option<usize>) -> Result<Self> {
-        let mut data = HashMap::new();
-        let mut all_timestamps = std::collections::HashSet::new();
+impl MultiSymbolMultiTFData {
+    /// Load tất cả symbol, tất cả timeframe về cùng anchor timeline (smallest tf)
+    pub fn load(
+        db: &Database,
+        symbols: &[String],
+        timeframes: &[String],
+        max_candles: Option<usize>,
+        anchor_tf: &str
+    ) -> Result<Self> {
+        let mut data: HashMap<String, HashMap<String, Vec<Candle>>> = HashMap::new();
+        let mut all_timestamps: HashSet<i64> = HashSet::new();
 
-        // Load data for each symbol
+        // Load all candles, build mapping cho từng symbol-tf
         for symbol in symbols {
-            let candles = db.load_history(symbol, max_candles)?;
-            if candles.is_empty() {
-                return Err(anyhow!("No data for symbol: {}", symbol));
+            let mut tf_map = HashMap::new();
+            for tf in timeframes {
+                let sym_tf = format!("{}_{}", symbol, tf);
+                let candles = db.load_history_symbol_tf(symbol, tf, max_candles)?;
+                for candle in &candles {
+                    all_timestamps.insert(candle.timestamp);
+                }
+                tf_map.insert(tf.clone(), candles);
             }
-
-            // Collect timestamps
-            for candle in &candles {
-                all_timestamps.insert(candle.timestamp);
-            }
-
-            data.insert(symbol.clone(), candles);
+            data.insert(symbol.clone(), tf_map);
         }
 
-        // Create sorted unified timeline
-        let mut timeline: Vec<i64> = all_timestamps.into_iter().collect();
-        timeline.sort_unstable();
+        // anchor timeline = timeline của anchor_tf, symbol đầu tiên (giả định mọi symbol anchor đều đủ dài)
+        let anchor_symbol = &symbols[0];
+        let anchor_candles = data
+            .get(anchor_symbol)
+            .and_then(|m| m.get(anchor_tf))
+            .ok_or_else(|| anyhow!("No anchor tf data for {}", anchor_symbol))?;
 
-        // Build indices for fast lookup
+        let anchor_timeline: Vec<i64> = anchor_candles.iter().map(|c| c.timestamp).collect();
+
+        // Build indices fast-lookup: [symbol][tf][timestamp] = idx
         let mut indices = HashMap::new();
-        for (symbol, candles) in &data {
-            let mut symbol_indices = HashMap::new();
-            for (idx, candle) in candles.iter().enumerate() {
-                symbol_indices.insert(candle.timestamp, idx);
+        for symbol in symbols {
+            let mut tf_indices = HashMap::new();
+            for tf in timeframes {
+                let col = data.get(symbol)
+                    .and_then(|m| m.get(tf)).unwrap_or(&vec![]);
+                let mut t_idx = HashMap::new();
+                for (i, candle) in col.iter().enumerate() {
+                    t_idx.insert(candle.timestamp, i);
+                }
+                tf_indices.insert(tf.clone(), t_idx);
             }
-            indices.insert(symbol.clone(), symbol_indices);
+            indices.insert(symbol.clone(), tf_indices);
         }
 
         Ok(Self {
             data,
-            timeline,
+            anchor_timeline,
             indices,
+            symbols: symbols.to_vec(),
+            timeframes: timeframes.to_vec(),
         })
     }
 
-    /// Get candle for a symbol at a specific timestamp
-    pub fn get_candle(&self, symbol: &str, timestamp: i64) -> Option<&Candle> {
-        let symbol_indices = self.indices.get(symbol)?;
-        let idx = symbol_indices.get(&timestamp)?;
-        self.data.get(symbol)?.get(*idx)
-    }
-
-    /// Get all available symbols
-    pub fn symbols(&self) -> Vec<String> {
-        self.data.keys().cloned().collect()
-    }
-
-    /// Get unified timeline
-    pub fn timeline(&self) -> &[i64] {
-        &self.timeline
-    }
-
-    /// Get number of timestamps in timeline
-    pub fn len(&self) -> usize {
-        self.timeline.len()
-    }
-
-    /// Check if data is empty
-    pub fn is_empty(&self) -> bool {
-        self.timeline.is_empty()
-    }
-
-    /// Get candles for a symbol in a time range (for building sequences)
-    /// Returns candles from start_idx to end_idx (inclusive) on the unified timeline
+    /// Lấy sequence của 1 symbol, 1 tf, align với anchor timeline
     pub fn get_sequence(
         &self,
         symbol: &str,
-        start_idx: usize,
-        end_idx: usize,
+        timeframe: &str,
+        start: usize,
+        end: usize,
     ) -> Vec<Option<&Candle>> {
-        if start_idx > end_idx || end_idx >= self.timeline.len() {
-            return Vec::new();
-        }
+        let timeline = &self.anchor_timeline;
+        let symbol_indices = self.indices.get(symbol)?.get(timeframe)?;
+        let symbol_data = self.data.get(symbol)?.get(timeframe)?;
 
-        let symbol_indices = match self.indices.get(symbol) {
-            Some(indices) => indices,
-            None => return Vec::new(),
-        };
-
-        let symbol_data = match self.data.get(symbol) {
-            Some(data) => data,
-            None => return Vec::new(),
-        };
-
-        (start_idx..=end_idx)
+        (start..=end)
             .map(|i| {
-                let timestamp = self.timeline[i];
+                if i >= timeline.len() { return None; }
+                let ts = timeline[i];
                 symbol_indices
-                    .get(&timestamp)
+                    .get(&ts)
                     .and_then(|idx| symbol_data.get(*idx))
             })
             .collect()
     }
 
-    /// Get the most recent valid candle for a symbol at or before a given timeline index
-    /// This is useful for filling gaps when a symbol doesn't have data at exact timestamp
-    pub fn get_last_valid_candle(
+    /// Lấy sequence multi-tf cho 1 symbol trong range (align anchor)
+    pub fn get_multi_tf_sequence(
         &self,
         symbol: &str,
-        timeline_idx: usize,
-    ) -> Option<&Candle> {
-        if timeline_idx >= self.timeline.len() {
-            return None;
+        start: usize,
+        end: usize,
+    ) -> HashMap<String, Vec<Option<&Candle>>> {
+        let mut out = HashMap::new();
+        for tf in &self.timeframes {
+            out.insert(tf.clone(), self.get_sequence(symbol, tf, start, end));
         }
-
-        let symbol_indices = self.indices.get(symbol)?;
-        let symbol_data = self.data.get(symbol)?;
-
-        // Search backwards from timeline_idx to find the most recent valid candle
-        for i in (0..=timeline_idx).rev() {
-            let timestamp = self.timeline[i];
-            if let Some(&idx) = symbol_indices.get(&timestamp) {
-                return symbol_data.get(idx);
-            }
-        }
-
-        None
+        out
     }
-}
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+    /// Trả về anchor timeline
+    pub fn timeline(&self) -> &[i64] {
+        &self.anchor_timeline
+    }
 
-    #[test]
-    fn test_timeline_alignment() {
-        // This test would require setting up a test database
-        // For now, we'll skip implementation
+    pub fn symbols(&self) -> &[String] {
+        &self.symbols
+    }
+    pub fn timeframes(&self) -> &[String] {
+        &self.timeframes
     }
 }
