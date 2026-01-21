@@ -4,8 +4,8 @@ import time
 import os
 
 exchange = ccxt.bybit({"enableRateLimit": True})
-symbols = ['BTC/USDT']
-tfs = {'1m': '1m'}
+symbols = ['BTC/USDT', 'ETH/USDT', 'SOL/USDT', 'BNB/USDT', 'XRP/USDT']
+tfs = {'1m': '1m', '5m': '5m', '15m': '15m', '1h': '1h', '4h': '4h'}
 since = exchange.parse8601('2021-01-01T00:00:00Z')
 limit = 1000
 os.makedirs('data', exist_ok=True)
@@ -34,9 +34,7 @@ for symbol in symbols:
             since_this = last_timestamp + 1
             time.sleep(exchange.rateLimit / 1000)
             i += 1
-            if len(ohlcv) < limit:
-                print(f"Break: last batch smaller than limit at iteration {i}")
-                break
+            # CHỈ break nếu KHÔNG NHẬN ĐƯỢC thêm nến! KHÔNG break nếu len(ohlcv) < limit!
         df = pd.DataFrame(all_ohlcv, columns=['timestamp','open','high','low','close','volume'])
         out_file = f"data/{symbol.replace('/','')}_{tf_name}.csv"
         df.to_csv(out_file, index=False)
