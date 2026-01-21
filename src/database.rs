@@ -109,6 +109,7 @@ impl Database {
     }
 
     /// Truy vấn lịch sử cho 1 symbol, 1 timeframe
+        /// Truy vấn lịch sử cho 1 symbol, 1 timeframe
     pub fn load_history_symbol_tf(
         &self,
         symbol: &str,
