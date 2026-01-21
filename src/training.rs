@@ -5,7 +5,7 @@ use std::collections::HashMap;
 use tracing::{debug, info, warn};
 
 use crate::config::Config;
-use crate::data_loader::MultiSymbolData;
+use crate::data_loader::MultiSymbolMultiTFData;
 use crate::ict::calculate_ict_features;
 use crate::portfolio::{Direction, Portfolio, PortfolioAction, SymbolAction};
 
