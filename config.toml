@@ -55,5 +55,5 @@ sizing_schedule = [
 max_leverage = 10.0
 
 [backtest]
-initial_balance = 1000.0
-max_candles_per_symbol = 5000  # Historical data limit
+initial_balance = 20.0
+max_candles_per_symbol = 10000000  # Historical data limit
