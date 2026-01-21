@@ -108,9 +108,7 @@ impl Database {
         Ok(count)
     }
 
-    /// Truy vấn lịch sử cho 1 symbol, 1 timeframe
-        /// Truy vấn lịch sử cho 1 symbol, 1 timeframe
-    pub fn load_history_symbol_tf(
+        pub fn load_history_symbol_tf(
         &self,
         symbol: &str,
         timeframe: &str,
@@ -132,7 +130,6 @@ impl Database {
                  ORDER BY timestamp ASC",
             ),
         };
-
         let mut stmt = self.conn.prepare(&query)?;
         let candles = stmt
             .query_map(params![symbol, timeframe], |row| {
@@ -146,7 +143,6 @@ impl Database {
                 })
             })?
             .collect::<std::result::Result<Vec<_>, _>>()?;
-
         Ok(candles)
     }
 }

@@ -15,7 +15,7 @@ pub struct Config {
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct SymbolsConfig {
     pub list: Vec<String>,
-    pub timeframe: String,
+    pub timeframes: Vec<String>, 
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
@@ -110,7 +110,7 @@ impl Default for Config {
                     "BNBUSDT".to_string(),
                     "XRPUSDT".to_string(),
                 ],
-                timeframe: "5m".to_string(),
+                timeframes: vec!["1m".to_string(), "5m".to_string(), "15m".to_string()],
             },
             model: ModelConfig {
                 sequence_length: 256,

@@ -4,7 +4,6 @@ use crate::ict::Candle;
 use crate::database::Database;
 
 /// Multi-symbol, multi-timeframe data loader.
-/// Aligns candles from different timeframes for each symbol, allowing building a state covering multiple resolutions.
 #[derive(Debug)]
 pub struct MultiSymbolMultiTFData {
     /// data[symbol][timeframe] = Vec<Candle>
@@ -19,7 +18,6 @@ pub struct MultiSymbolMultiTFData {
 }
 
 impl MultiSymbolMultiTFData {
-    /// Load mọi symbol/mọi timeframe, align về anchor timeline (tf nhỏ nhất)
     pub fn load(
         db: &Database,
         symbols: &[String],
@@ -30,7 +28,6 @@ impl MultiSymbolMultiTFData {
         let mut data: HashMap<String, HashMap<String, Vec<Candle>>> = HashMap::new();
         let mut all_timestamps: HashSet<i64> = HashSet::new();
 
-        // Load full data and build mapping cho từng symbol-tf
         for symbol in symbols {
             let mut tf_map = HashMap::new();
             for tf in timeframes {
@@ -43,7 +40,6 @@ impl MultiSymbolMultiTFData {
             data.insert(symbol.clone(), tf_map);
         }
 
-        // Anchor timeline = timeline của symbol đầu tiên, tf nhỏ nhất
         let anchor_symbol = &symbols[0];
         let anchor_candles = data
             .get(anchor_symbol)
@@ -51,20 +47,12 @@ impl MultiSymbolMultiTFData {
             .ok_or_else(|| anyhow!("No anchor tf data for {}", anchor_symbol))?;
         let anchor_timeline: Vec<i64> = anchor_candles.iter().map(|c| c.timestamp).collect();
 
-        // Build indices [symbol][tf][timestamp] -> idx
         let mut indices = HashMap::new();
         for symbol in symbols {
             let mut tf_indices = HashMap::new();
             for tf in timeframes {
-                let col = if let Some(m) = data.get(symbol) {
-                    m.get(tf)
-                } else {
-                    None
-                };
-                let tf_data = match col {
-                    Some(candles) => candles,
-                    None => &Vec::new(),
-                };
+                let col = if let Some(m) = data.get(symbol) { m.get(tf) } else { None };
+                let tf_data = match col { Some(candles) => candles, None => &Vec::new() };
                 let mut t_idx = HashMap::new();
                 for (i, candle) in tf_data.iter().enumerate() {
                     t_idx.insert(candle.timestamp, i);
@@ -83,7 +71,6 @@ impl MultiSymbolMultiTFData {
         })
     }
 
-    /// Lấy sequence của 1 symbol, 1 tf, aligned với anchor timeline
     pub fn get_sequence(
         &self,
         symbol: &str,
@@ -115,7 +102,6 @@ impl MultiSymbolMultiTFData {
             .collect()
     }
 
-    /// Lấy sequences multi-timeframe cho 1 symbol, range [start, end]
     pub fn get_multi_tf_sequence(
         &self,
         symbol: &str,
@@ -129,7 +115,6 @@ impl MultiSymbolMultiTFData {
         out
     }
 
-    /// Returns anchor timeline (vector of timestamp theo tf nhỏ nhất)
     pub fn timeline(&self) -> &[i64] {
         &self.anchor_timeline
     }

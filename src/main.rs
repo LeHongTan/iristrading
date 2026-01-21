@@ -12,7 +12,7 @@ mod training;
 use database::Database;
 use config::Config;
 use data_loader::MultiSymbolMultiTFData;
-use training::{PythonBrain as MultiSymbolBrain, TrainingEngine};
+use training::TrainingEngine;
 
 #[derive(Debug, Clone, ValueEnum)]
 enum TradingMode {
@@ -29,16 +29,12 @@ struct Args {
     mode: TradingMode,
     #[arg(short, long, default_value = "BTCUSDT")]
     symbol: String,
-
     #[arg(long, default_value = "5m")]
     timeframe: String,
-
     #[arg(short, long, default_value = "1000.0")]
     balance: f64,
-
     #[arg(long, default_value = "iris_trading.db")]
     database: String,
-
     #[arg(long, default_value = "500")]
     candles: usize,
 }
@@ -56,15 +52,8 @@ fn main() -> Result<()> {
     } else {
         vec![args.symbol.clone()]
     };
-    // Nếu config có timeframes array, lấy từ đó, nếu không thì lấy từ arg
-    let timeframes: Vec<String> = if let Some(tfvec) = {
-        // Dùng reflection/trick nếu config chưa có timeframes, fallback 1 tf
-        #[allow(unused)]
-        struct _Tmp { timeframes: Option<Vec<String>> }
-        None
-    } {
-        // add custom code if you implement timeframes[] in config
-        vec![]
+    let timeframes: Vec<String> = if !config.symbols.timeframes.is_empty() {
+        config.symbols.timeframes.clone()
     } else {
         vec![args.timeframe.clone()]
     };
@@ -79,7 +68,6 @@ fn main() -> Result<()> {
         anchor_tf,
     )?;
 
-    // Example: bạn có thể debug số nến
     println!(
         "Loaded data for {} symbols, {} timeframes, anchor timeline len {}",
         multi_data.symbols().len(),
@@ -87,7 +75,18 @@ fn main() -> Result<()> {
         multi_data.timeline().len()
     );
 
-    // TODO: Tiếp tục pipeline của bạn (ví dụ training, backtest, truyền state cho AI agent...)
+    // === ĐÂY: Khởi tạo training engine & chạy train/backtest pipeline ===
+    let mut engine = TrainingEngine::new(config.clone(), multi_data);
+
+    // TRAIN phase
+    engine.train_agent()?;
+    println!("TRAIN: steps {}, profit {}", engine.report.train_steps, engine.report.train_profit);
+
+    // BACKTEST phase
+    engine.run_backtest()?;
+    println!("BACKTEST: steps {}, profit {}", engine.report.test_steps, engine.report.test_profit);
+
+    // (Nếu muốn, bạn có thể vẽ equity curve từ engine.report.test_log)
 
     Ok(())
 }

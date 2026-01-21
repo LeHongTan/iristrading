@@ -6,7 +6,6 @@ def import_csv(symbol, tf):
     fpath = f"data/{symbol}_{tf}.csv"
     df = pd.read_csv(fpath)
     conn = sqlite3.connect("iris_trading.db")
-    df['symbol'] = symbol
     cursor = conn.cursor()
     for idx, row in df.iterrows():
         cursor.execute('''
@@ -14,7 +13,7 @@ def import_csv(symbol, tf):
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         ''', (
             symbol,
-            tf, 
+            tf,
             int(row['timestamp']),
             float(row['open']),
             float(row['high']),
