@@ -4,7 +4,7 @@ use crate::ict::Candle;
 use crate::database::Database;
 
 /// Multi-symbol, multi-timeframe data loader.
-#[derive(Debug)]
+#[derive(Debug, Clone)] // <--- thêm Clone ở đây
 pub struct MultiSymbolMultiTFData {
     /// data[symbol][timeframe] = Vec<Candle>
     data: HashMap<String, HashMap<String, Vec<Candle>>>,

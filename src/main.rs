@@ -75,18 +75,17 @@ fn main() -> Result<()> {
         multi_data.timeline().len()
     );
 
-    // === ĐÂY: Khởi tạo training engine & chạy train/backtest pipeline ===
-    let mut engine = TrainingEngine::new(config.clone(), multi_data);
+    // ============ VÒNG LẶP CHẠY ĐA SEED =============
+    let seeds = vec![42, 123, 77, 233, 1337, 2024, 7, 21];
+    println!("Seed,TRAIN_Profit,TEST_Profit");
 
-    // TRAIN phase
-    engine.train_agent()?;
-    println!("TRAIN: steps {}, profit {}", engine.report.train_steps, engine.report.train_profit);
+    for &seed in &seeds {
+        let mut engine = TrainingEngine::new_with_seed(config.clone(), multi_data.clone(), seed);
 
-    // BACKTEST phase
-    engine.run_backtest()?;
-    println!("BACKTEST: steps {}, profit {}", engine.report.test_steps, engine.report.test_profit);
-
-    // (Nếu muốn, bạn có thể vẽ equity curve từ engine.report.test_log)
+        engine.train_agent()?;
+        engine.run_backtest()?;
+        println!("{},{},{}", seed, engine.report.train_profit, engine.report.test_profit);
+    }
 
     Ok(())
 }

@@ -5,16 +5,16 @@ use crate::config::{Config, ExecutionConfig, PositionSizingConfig};
 /// Position direction
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum Direction {
-    Hold = 0,
-    Long = 1,
-    Short = 2,
+    Hold,
+    Long,
+    Short,
 }
 
 impl Direction {
     pub fn from_i32(value: i32) -> Self {
         match value {
             1 => Direction::Long,
-            2 => Direction::Short,
+            -1 => Direction::Short,
             _ => Direction::Hold,
         }
     }
@@ -26,6 +26,16 @@ pub struct SymbolAction {
     pub direction: Direction,
     /// Size fraction in [0, 1] to be mapped to target notional
     pub size_fraction: f64,
+}
+
+impl SymbolAction {
+    /// Convert i32 from agent (default size_fraction=1.0, bạn muốn dynamic thì sửa thêm)
+    pub fn from_i32(v: i32) -> Self {
+        SymbolAction {
+            direction: Direction::from_i32(v),
+            size_fraction: 1.0,
+        }
+    }
 }
 
 /// Portfolio action across all symbols
