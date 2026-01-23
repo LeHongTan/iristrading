@@ -10,10 +10,11 @@ use crate::portfolio::{PortfolioAction, Portfolio, SymbolAction};
 use std::process::{Command, Stdio};
 use std::io::Write;
 
-pub fn get_action_from_python(state: &[f64], seed: u64) -> anyhow::Result<Vec<i32>> {
+pub fn get_action_from_python(state: &[f64], seed: u64, n_symbols: usize) -> anyhow::Result<Vec<i32>> {
     let mut child = Command::new("python3")
         .arg("python/agent.py")
         .arg(seed.to_string())
+        .arg(n_symbols.to_string())
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
         .spawn()
@@ -24,7 +25,6 @@ pub fn get_action_from_python(state: &[f64], seed: u64) -> anyhow::Result<Vec<i3
         let state_json = serde_json::to_string(&state).unwrap();
         child_stdin.write_all(state_json.as_bytes()).unwrap();
     }
-
     let output = child.wait_with_output().unwrap();
     let action: Vec<i32> = serde_json::from_slice(&output.stdout).unwrap();
     Ok(action)
@@ -89,11 +89,13 @@ impl TrainingEngine {
         let warmup_steps = self.config.training.warmup_steps.min(train_last_idx);
         self.portfolio = Portfolio::new(self.config.backtest.initial_balance, self.config.symbols.list.clone(), &self.config);
 
+        let n_symbols = self.data.symbols().len();
+
         for step in warmup_steps..=train_last_idx {
-            let mut multi_tf_sequences = HashMap::new();
+            let mut multi_tf_sequences: HashMap<String, HashMap<String, Vec<Option<&crate::ict::Candle>>>> = HashMap::new();
             for symbol in self.data.symbols() {
                 multi_tf_sequences.insert(
-                    symbol.clone(),
+                    symbol.to_string(),
                     self.data.get_multi_tf_sequence(
                         symbol,
                         step + 1 - self.config.model.sequence_length,
@@ -101,29 +103,29 @@ impl TrainingEngine {
                     )
                 );
             }
-            // Đúng: flatten state sang Vec<f64> (close)
+            // Fix kiểu dữ liệu rõ ràng khi flatten state
             let mut flat_state = Vec::new();
             for symbol_seq in multi_tf_sequences.values() {
                 for tf_seq in symbol_seq.values() {
-                    for candle in tf_seq {
-                        flat_state.push(candle.as_ref().map(|x| x.close).unwrap_or(0.0));
+                    for candle_opt in tf_seq.iter() {
+                        flat_state.push(candle_opt.map(|x| x.close).unwrap_or(0.0));
                     }
                 }
             }
-            // GỌI AGENT PYTHON LẤY ACTION
             let agent_seed = self.seed.unwrap_or(42);
-            let acts = get_action_from_python(&flat_state, agent_seed)?;
-            // Map acts (i32) về SymbolAction theo thứ tự symbol
+            let acts = get_action_from_python(&flat_state, agent_seed, n_symbols)?;
+            println!("TRAIN step {} AGENT ACTS: {:?}", step, acts);
+
             let mut actions = HashMap::new();
             for (symbol, &act) in self.data.symbols().iter().zip(acts.iter()) {
-                actions.insert(symbol.clone(), SymbolAction::from_i32(act));
+                actions.insert(symbol.to_string(), SymbolAction::from_i32(act));
             }
             let action = PortfolioAction { actions };
-            self.portfolio.execute_action(
+            let _ = self.portfolio.execute_action(
                 &action,
                 &self.get_prices(step),
                 timeline[step],
-            )?;
+            );
         }
 
         let profit = self.portfolio.equity() - self.config.backtest.initial_balance;
@@ -139,11 +141,13 @@ impl TrainingEngine {
         let mut portfolio = Portfolio::new(self.config.backtest.initial_balance, self.config.symbols.list.clone(), &self.config);
         let mut test_log = Vec::new();
 
+        let n_symbols = self.data.symbols().len();
+
         for step in test_first_idx..timeline.len() {
-            let mut multi_tf_sequences = HashMap::new();
+            let mut multi_tf_sequences: HashMap<String, HashMap<String, Vec<Option<&crate::ict::Candle>>>> = HashMap::new();
             for symbol in self.data.symbols() {
                 multi_tf_sequences.insert(
-                    symbol.clone(),
+                    symbol.to_string(),
                     self.data.get_multi_tf_sequence(
                         symbol,
                         step + 1 - self.config.model.sequence_length,
@@ -154,23 +158,25 @@ impl TrainingEngine {
             let mut flat_state = Vec::new();
             for symbol_seq in multi_tf_sequences.values() {
                 for tf_seq in symbol_seq.values() {
-                    for candle in tf_seq {
-                        flat_state.push(candle.as_ref().map(|x| x.close).unwrap_or(0.0));
+                    for candle_opt in tf_seq.iter() {
+                        flat_state.push(candle_opt.map(|x| x.close).unwrap_or(0.0));
                     }
                 }
             }
             let agent_seed = self.seed.unwrap_or(42);
-            let acts = get_action_from_python(&flat_state, agent_seed)?;
+            let acts = get_action_from_python(&flat_state, agent_seed, n_symbols)?;
+            println!("TEST step {} AGENT ACTS: {:?}", step, acts);
+
             let mut actions = HashMap::new();
             for (symbol, &act) in self.data.symbols().iter().zip(acts.iter()) {
-                actions.insert(symbol.clone(), SymbolAction::from_i32(act));
+                actions.insert(symbol.to_string(), SymbolAction::from_i32(act));
             }
             let action = PortfolioAction { actions };
-            portfolio.execute_action(
+            let _ = portfolio.execute_action(
                 &action,
                 &self.get_prices(step),
                 timeline[step],
-            )?;
+            );
 
             test_log.push((timeline[step], portfolio.equity()));
         }
@@ -189,8 +195,12 @@ impl TrainingEngine {
         for symbol in self.data.symbols() {
             let anchor_tf = &self.data.timeframes()[0];
             let seq = self.data.get_sequence(symbol, anchor_tf, step, step);
-            let price = seq.first().and_then(|c| c.map(|x| x.close)).unwrap_or(0.0);
-            prices.insert(symbol.clone(), price);
+            // Fix kiểu dữ liệu rõ ràng ở đây:
+            let price = match seq.first() {
+                Some(Some(candle)) => candle.close,
+                _ => 0.0,
+            };
+            prices.insert(symbol.to_string(), price);
         }
         prices
     }

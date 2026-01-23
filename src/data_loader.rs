@@ -15,7 +15,7 @@ pub struct MultiSymbolMultiTFData {
     /// List symbol, list timeframe được load
     symbols: Vec<String>,
     timeframes: Vec<String>,
-}
+} // <-- xoá chữ "s" ở đây!
 
 impl MultiSymbolMultiTFData {
     pub fn load(
@@ -108,7 +108,7 @@ impl MultiSymbolMultiTFData {
         start: usize,
         end: usize,
     ) -> HashMap<String, Vec<Option<&Candle>>> {
-        let mut out = HashMap::new();
+        let mut out: HashMap<String, Vec<Option<&Candle>>> = HashMap::new(); // rõ type
         for tf in &self.timeframes {
             out.insert(tf.clone(), self.get_sequence(symbol, tf, start, end));
         }

@@ -3,12 +3,13 @@ import json
 import numpy as np
 
 SEED = int(sys.argv[1]) if len(sys.argv) > 1 else 42
+N_SYMBOLS = int(sys.argv[2]) if len(sys.argv) > 2 else 1
 np.random.seed(SEED)
 
-# TODO: Thay bằng nhập mô hình AI RL thực tế của bạn
 def get_action(state):
-    # Hiện tại trả random; sau này dùng model.predict(state)
-    return [int(np.random.choice([-1, 0, 1])) for _ in state]  # buy/hold/sell cho mỗi symbol
+    # Bạn muốn agent trade thật không chỉ hold thì random cả BUY+SELL luôn:
+    return [int(x) for x in np.random.choice([-1, 1], N_SYMBOLS)]
+    # Muốn nhiều HOLD hơn thì dùng [-1, 0, 1] thay vì trên
 
 if __name__ == "__main__":
     state = json.loads(sys.stdin.read())

@@ -64,7 +64,7 @@ fn main() -> Result<()> {
         &db,
         &symbols,
         &timeframes,
-        Some(args.candles),
+        None,
         anchor_tf,
     )?;
 
