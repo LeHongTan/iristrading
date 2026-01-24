@@ -19,3 +19,6 @@ logs/
 checkpoints/
 *.pt
 data/
+*logs_eval/
+*logs_sb3/
+*best_model/
